@@ -7,6 +7,7 @@ var bodyParser = require('body-parser');
 var indexRouter = require('./routes/index');
 var participationRouter = require('./routes/participation');
 var currencyRouter = require('./routes/currency');
+var labRouter = require('./routes/lab');
 
 var usersRouter = require('./routes/users');
 var devicesRouter = require('./routes/devices');
@@ -44,6 +45,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/participation', participationRouter);
 app.use('/currency', currencyRouter);
+app.use('/lab', labRouter);
 
 app.use('/users', usersRouter);
 app.use('/devices', devicesRouter);
