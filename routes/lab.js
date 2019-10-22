@@ -26,7 +26,7 @@ router.get('/status', function(req, res, next){
                                         count += 1;
                                 }
                                 if (count == 0) {
-                                        var errormsg = {"error" : "Zip does not exist in database"};
+                                        var errormsg = {"error" : "Zip does not exist in the database."};
                                         res.status(400).send(JSON.stringify(errormsg));
                                 }
                                 else {
