@@ -37,7 +37,6 @@ router.post('/signin', function(req, res, next) {
 
 /* Register a new user */
 router.post('/register', function(req, res, next) {
-   
    bcrypt.hash(req.body.password, 10, function(err, hash) {
       if (err) {
          res.status(400).json({success : false, message : err.errmsg});         
@@ -61,22 +60,37 @@ router.post('/register', function(req, res, next) {
    });   
 });
 
-/* Register a new user */
-router.post("/tokenRegister", function(req, res) {
-  console.log("SUCCESS");
-  var authToken = req.body.idtoken;
-  console.log(secret);
-  try {
+router.post('/registerToken', function(req, res, next) {
+   // Check for authentication token in x-auth header
+   if (!req.body.idtoken) {
+      return res.status(401).json({success: false, message: "No authentication token"});
+   }
+   return res.status(401).json({success: false, message: req.body.idtoken});
+
+   var authToken = req.body.idtoken;
+   
+   try {
       var decodedToken = jwt.decode(authToken, secret);
-      console.log(decodedToken);
+      
+      var newUser = new User ({
+          email: decodedToken.email,
+          fullName: decodedToken.name,
+          passwordHash: authToken
+      });
 
-      res.status(400).json({success : false});
-  }
-  catch (ex) {
-     return res.status(401).json({success: false, message: "Invalid authentication token."});
-  }
+      newUser.save(function(err, user) {
+        if (err) {
+           res.status(400).json({success : false, message : err.errmsg});         
+        }
+        else {
+           res.status(201).json({success : true, message : decodedToken.name + "has been created"});                      
+        }
+      });
 
-
+   }
+   catch (ex) {
+      return res.status(401).json({success: false, message: "Invalid authentication token."});
+   }
 });
 
 

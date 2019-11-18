@@ -8,14 +8,14 @@ function onSignIn(googleUser) {
    console.log(id_token);
 
    $.ajax({
-	   url: '/users/register',
-	   type: 'POST',
-	   contentType: 'application/json',
-	   data: JSON.stringify({idtoken: id_token}),
-	   dataType: 'json'
-   })
-     .done(registerSuccess)
-     .fail(registerError);
+   url: '/users/registerToken',
+   type: 'POST',
+   contentType: 'application/json',
+   data: JSON.stringify({idtoken:id_token}),
+   dataType: 'json'
+  })
+    .done(registerSuccess)
+    .fail(registerError);
 }
 
 function registerSuccess(data, textStatus, jqXHR) {
