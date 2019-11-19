@@ -1,14 +1,15 @@
 var db = require("../devicedb");
 
 var deviceDataSchema = new db.Schema({
-    gps_lat:  Number,
-    gps_long: Number,
-    uv:       Number,
-    visible:  Number,
-    ir:       Number,
-    time:     Date,
-    deviceID: String,
-    APIkey:   String
+    gps_exists: { type: boolean, required: true },
+    gps_lat:    { type: Number, required: true},
+    gps_long:   { type: Number, required: true},
+    uv:         { type: Number, required: true},
+    visible:    { type: Number, required: true},
+    ir:         { type: Number, required: true},
+    time:       { type: Date, required: true},
+    deviceID:   { type: String, required: true },
+    APIkey:     { type: String, required: true },
 });
 
 var DeviceData = db.model("DeviceData", deviceSchema);
