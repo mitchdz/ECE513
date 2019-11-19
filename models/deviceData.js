@@ -6,7 +6,9 @@ var deviceDataSchema = new db.Schema({
     uv:       Number,
     visible:  Number,
     ir:       Number,
-    time:     Date
+    time:     Date,
+    deviceID: String,
+    APIkey:   String
 });
 
 var DeviceData = db.model("DeviceData", deviceSchema);
