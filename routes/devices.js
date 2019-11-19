@@ -47,6 +47,35 @@ router.get('/status/:devid', function(req, res, next) {
   });
 });
 
+router.post('/deviceData', function(req, res, next) {
+    let responseJson = {
+        removed: false,
+        message : "",
+    };
+
+    if ( !req.body.hasOwnProperty("gps_location")) {
+        responseJson.message = "Missing deviceId.";
+        return res.status(400).json(responseJson);
+    }
+
+    if ( !req.body.hasOwnProperty("uv")) {
+        responseJson.message = "Missing uv.";
+        return res.status(400).json(responseJson);
+    }
+
+    if ( !req.body.hasOwnProperty("time")) {
+        responseJson.message = "Missing deviceId.";
+        return res.status(400).json(responseJson);
+    }
+
+    let gps_location = req.body.gps_location;
+    let time = req.body.time;
+    let uv = req.body.uv;
+
+
+});
+
+
 router.post('/register', function(req, res, next) {
   let responseJson = {
     registered: false,

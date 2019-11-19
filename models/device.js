@@ -1,4 +1,4 @@
-var db = require("../db");
+var db = require("../devicedb");
 
 var deviceSchema = new db.Schema({
     apikey:       String,
