@@ -59,15 +59,14 @@ router.post('/deviceData', function(req, res, next) {
         responseJson.message = "Missing gps_exists.";
         return res.status(400).json(responseJson);
     }
-    if (req.body.gps_exists) {
-        if ( !req.body.hasOwnProperty("gps_lat")) {
-            responseJson.message = "Missing gps_lat.";
-            return res.status(400).json(responseJson);
-        }
-        if ( !req.body.hasOwnProperty("gps_long")) {
-            responseJson.message = "Missing gps_long.";
-            return res.status(400).json(responseJson);
-        }
+    
+    if ( !req.body.hasOwnProperty("gps_lat")) {
+        responseJson.message = "Missing gps_lat.";
+        return res.status(400).json(responseJson);
+    }
+    if ( !req.body.hasOwnProperty("gps_long")) {
+        responseJson.message = "Missing gps_long.";
+        return res.status(400).json(responseJson);
     }
 
     if ( !req.body.hasOwnProperty("uv")) {
@@ -94,7 +93,7 @@ router.post('/deviceData', function(req, res, next) {
         let gps_lat = req.body.gps_location;
         let gps_long = req.body.gps_long;
     }
-    
+
     // Create a new device with specified id, user email, and randomly generated apikey.
     let newDeviceData = new DeviceData({
         gps_exists: req.body.gps_exists;
