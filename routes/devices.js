@@ -94,17 +94,16 @@ router.post('/deviceData', function(req, res, next) {
         let gps_lat = req.body.gps_location;
         let gps_long = req.body.gps_long;
     }
-    let time = req.body.time;
-    let uv = req.body.uv;
-    let deviceId = req.body.deviceId;
-    let APIkey = req.body.APIkey;
-
-
+    
     // Create a new device with specified id, user email, and randomly generated apikey.
     let newDeviceData = new DeviceData({
-        deviceId: deviceId,
-        userEmail: email,
-        apikey: deviceApikey
+        gps_exists: req.body.gps_exists;
+        gps_lat: req.body.gps_lat;
+        gps_long: req.body.gps_long;
+        uv: req.body.uv;
+        time: req.body.time;
+        deviceId: req.body.deviceId;
+        APIkey: req.body.APIkey;
     });
 
     // Save device. If successful, return success. If not, return error message.
