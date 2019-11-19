@@ -53,9 +53,19 @@ router.post('/deviceData', function(req, res, next) {
         message : "",
     };
 
-    if ( !req.body.hasOwnProperty("gps_location")) {
-        responseJson.message = "Missing deviceId.";
+    if ( !req.body.hasOwnProperty("gps_exists")) {
+        responseJson.message = "Missing gps_exists.";
         return res.status(400).json(responseJson);
+    }
+    if (req.body.gps_exists) {
+        if ( !req.body.hasOwnProperty("gps_lat")) {
+            responseJson.message = "Missing gps_lat.";
+            return res.status(400).json(responseJson);
+        }
+        if ( !req.body.hasOwnProperty("gps_long")) {
+            responseJson.message = "Missing gps_long.";
+            return res.status(400).json(responseJson);
+        }
     }
 
     if ( !req.body.hasOwnProperty("uv")) {
@@ -64,13 +74,28 @@ router.post('/deviceData', function(req, res, next) {
     }
 
     if ( !req.body.hasOwnProperty("time")) {
-        responseJson.message = "Missing deviceId.";
+        responseJson.message = "Missing time.";
         return res.status(400).json(responseJson);
     }
 
-    let gps_location = req.body.gps_location;
+    if ( !req.body.hasOwnProperty("deviceID")) {
+        responseJson.message = "Missing deviceID.";
+        return res.status(400).json(responseJson);
+    }
+
+    if ( !req.body.hasOwnProperty("APIkey")) {
+        responseJson.message = "Missing APIkey.";
+        return res.status(400).json(responseJson);
+    }
+
+    if (req.body.gps_exists) {
+        let gps_lat = req.body.gps_location;
+        let gps_long = req.body.gps_long;
+    }
     let time = req.body.time;
     let uv = req.body.uv;
+    let deviceID = req.body.deviceID;
+    let APIkey = req.body.APIkey;
 
 
 });
