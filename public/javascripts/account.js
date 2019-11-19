@@ -42,30 +42,38 @@ function accountInfoError(jqXHR, textStatus, errorThrown) {
 
 // Registers the specified device with the server.
 function registerDevice() {
-  $.ajax({
-    url: '/devices/register',
-    type: 'POST',
-    headers: { 'x-auth': window.localStorage.getItem("authToken") },  
-    contentType: 'application/json',
-    data: JSON.stringify({ deviceId: $("#deviceId").val(), email:$("#email").text() }), 
-    dataType: 'json'
-   })
-     .done(function (data, textStatus, jqXHR) {
-       // Add new device to the device list
-       $("#addDeviceForm").before("<li class='collection-item'>ID: " +
-       $("#deviceId").val() + ", APIKEY: " + data["apikey"] + 
-         " <button id='ping-" + $("#deviceId").val() + "' class='waves-effect waves-light btn'>Ping</button> " +
-         "</li>");
-       $("#ping-"+$("#deviceId").val()).click(function(event) {
-         pingDevice(event, device.deviceId);
-       });
-       hideAddDeviceForm();
+  var alphanumericTest = /^[a-zA-Z0-9_]*$/;
+  if (alphanumericTest.test($('#deviceId').val())) {
+    $.ajax({
+      url: '/devices/register',
+      type: 'POST',
+      headers: { 'x-auth': window.localStorage.getItem("authToken") },  
+      contentType: 'application/json',
+      data: JSON.stringify({ deviceId: $("#deviceId").val(), email:$("#email").text() }), 
+      dataType: 'json'
      })
-     .fail(function(jqXHR, textStatus, errorThrown) {
-       let response = JSON.parse(jqXHR.responseText);
-       $("#error").html("Error: " + response.message);
-       $("#error").show();
-     }); 
+       .done(function (data, textStatus, jqXHR) {
+         // Add new device to the device list
+         $("#addDeviceForm").before("<li class='collection-item'>ID: " +
+         $("#deviceId").val() + ", APIKEY: " + data["apikey"] + 
+           " <button id='ping-" + $("#deviceId").val() + "' class='waves-effect waves-light btn'>Ping</button> " +
+           "</li>");
+         $("#ping-"+$("#deviceId").val()).click(function(event) {
+           pingDevice(event, device.deviceId);
+         });
+         hideAddDeviceForm();
+       })
+       .fail(function(jqXHR, textStatus, errorThrown) {
+         let response = JSON.parse(jqXHR.responseText);
+         $("#error").html("Error: " + response.message);
+         $("#error").show();
+       }); 
+  }
+  else {
+         $("#error").html("Error: only alphanumeric characters allowed");
+         $("#error").show();    
+  }
+
 }
 
 function pingDevice(event, deviceId) {
