@@ -14,7 +14,7 @@ function sendRegisterRequest() {
 
 
   $.ajax({
-   url: '/users/register',
+   url: 'https://lysecky.org/users/register',
    type: 'POST',
    contentType: 'application/json',
    data: JSON.stringify({email:email, fullName:fullName, password:password}),
