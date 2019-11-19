@@ -20,14 +20,9 @@ function accountInfoSuccess(data, textSatus, jqXHR) {
     $("#addDeviceForm").before("<li class='collection-item'>ID: " +
       device.deviceId + ", APIKEY: " + device.apikey + 
       " <button id='ping-" + device.deviceId + "' class='waves-effect waves-light btn'>Ping</button> " +
-      " </li>" +
-      " <button id='replace-" + device.deviceId + "' class='waves-effect waves-light btn'>Replace</button> " +
       " </li>");
-    $("#replace-"+device.deviceId).click(function(event) {
+    $("#ping-"+device.deviceId).click(function(event) {
       pingDevice(event, device.deviceId);
-    });
-    $("#replace-"+device.deviceId).click(function(event) {
-      replaceDevice(event, device.deviceId);
     });
   }
 }
@@ -52,23 +47,18 @@ function registerDevice() {
     type: 'POST',
     headers: { 'x-auth': window.localStorage.getItem("authToken") },  
     contentType: 'application/json',
-    data: JSON.stringify({ deviceId: $("#deviceId").val(), email: $("#email").text() }), 
+    data: JSON.stringify({ deviceId: $("#deviceId").val(), email:$("#email").text() }), 
     dataType: 'json'
    })
      .done(function (data, textStatus, jqXHR) {
        // Add new device to the device list
-    $("#addDeviceForm").before("<li class='collection-item'>ID: " +
-      device.deviceId + ", APIKEY: " + device.apikey + 
-      " <button id='ping-" + device.deviceId + "' class='waves-effect waves-light btn'>Ping</button> " +
-      " </li>" +
-      " <button id='replace-" + device.deviceId + "' class='waves-effect waves-light btn'>Replace</button> " +
-      " </li>");
-    $("#ping-"+device.deviceId).click(function(event) {
-      pingDevice(event, device.deviceId);
-    });
-    $("#replace-"+device.deviceId).click(function(event) {
-      replaceDevice(event, device.deviceId);
-    });
+       $("#addDeviceForm").before("<li class='collection-item'>ID: " +
+       $("#deviceId").val() + ", APIKEY: " + data["apikey"] + 
+         " <button id='ping-" + $("#deviceId").val() + "' class='waves-effect waves-light btn'>Ping</button> " +
+         "</li>");
+       $("#ping-"+$("#deviceId").val()).click(function(event) {
+         pingDevice(event, device.deviceId);
+       });
        hideAddDeviceForm();
      })
      .fail(function(jqXHR, textStatus, errorThrown) {
@@ -77,11 +67,6 @@ function registerDevice() {
        $("#error").show();
      }); 
 }
-
-function replaceDevice(event, deviceId) {
-  console.log("IMPLEMENT ME!");
-}
-
 
 function pingDevice(event, deviceId) {
    $.ajax({
@@ -131,4 +116,3 @@ $(function() {
   $("#registerDevice").click(registerDevice);  
   $("#cancel").click(hideAddDeviceForm);  
 });
-
