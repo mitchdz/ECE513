@@ -47,7 +47,6 @@ app.use('/participation', participationRouter);
 app.use('/currency', currencyRouter);
 app.use('/lab', labRouter);
 
-app.use('/users', usersRouter);
 app.use('/devices', devicesRouter);
 app.use('/potholes', potholesRouter);
 
