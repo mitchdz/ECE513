@@ -59,7 +59,7 @@ router.post('/deviceData', function(req, res, next) {
         responseJson.message = "Missing gps_exists.";
         return res.status(400).json(responseJson);
     }
-    
+
     if ( !req.body.hasOwnProperty("gps_lat")) {
         responseJson.message = "Missing gps_lat.";
         return res.status(400).json(responseJson);
@@ -96,13 +96,13 @@ router.post('/deviceData', function(req, res, next) {
 
     // Create a new device with specified id, user email, and randomly generated apikey.
     let newDeviceData = new DeviceData({
-        gps_exists: req.body.gps_exists;
-        gps_lat: req.body.gps_lat;
-        gps_long: req.body.gps_long;
-        uv: req.body.uv;
-        time: req.body.time;
-        deviceId: req.body.deviceId;
-        APIkey: req.body.APIkey;
+        gps_exists: req.body.gps_exists,
+        gps_lat: req.body.gps_lat,
+        gps_long: req.body.gps_long,
+        uv: req.body.uv,
+        time: req.body.time,
+        deviceId: req.body.deviceId,
+        APIkey: req.body.APIkey
     });
 
     // Save device. If successful, return success. If not, return error message.

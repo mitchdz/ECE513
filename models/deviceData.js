@@ -1,7 +1,7 @@
 var db = require("../devicedb");
 
 var deviceDataSchema = new db.Schema({
-    gps_exists: { type: boolean, required: true },
+    gps_exists: { type: Boolean, required: true },
     gps_lat:    { type: Number, required: true },
     gps_long:   { type: Number, required: true },
     uv:         { type: Number, required: true },
@@ -10,6 +10,6 @@ var deviceDataSchema = new db.Schema({
     APIkey:     { type: String, required: true },
 });
 
-var DeviceData = db.model("DeviceData", deviceSchema);
+var DeviceData = db.model("DeviceData", deviceDataSchema);
 
 module.exports = DeviceData;
