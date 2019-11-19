@@ -12,6 +12,7 @@ function sendRegisterRequest() {
     return;
   }
 
+
   $.ajax({
    url: '/users/register',
    type: 'POST',
@@ -24,7 +25,7 @@ function sendRegisterRequest() {
 }
 
 function registerSuccess(data, textStatus, jqXHR) {
-  if (data.success) {  
+  if (data.success) {
     window.location = "index.html";
   }
   else {
