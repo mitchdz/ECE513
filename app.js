@@ -51,6 +51,10 @@ app.use('/users', usersRouter);
 app.use('/devices', devicesRouter);
 app.use('/potholes', potholesRouter);
 
+indexRouter.get('/', function(req, res) {
+  res.sendFile(path.join(__dirname + '/public/sunrunr/index.html'));
+});
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));

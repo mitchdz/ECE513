@@ -39,7 +39,7 @@ router.post('/signin', function(req, res, next) {
 router.post('/register', function(req, res, next) {
    bcrypt.hash(req.body.password, 10, function(err, hash) {
       if (err) {
-         res.status(400).json({success : false, message : err.errmsg});         
+         res.status(400).json({success : false, message : err.errmsg});
       }
       else {
         var newUser = new User ({
@@ -47,17 +47,17 @@ router.post('/register', function(req, res, next) {
             fullName: req.body.fullName,
             passwordHash: hash
         });
-        
+
         newUser.save(function(err, user) {
           if (err) {
-             res.status(400).json({success : false, message : err.errmsg});         
+             res.status(400).json({success : false, message : err.errmsg});
           }
           else {
-             res.status(201).json({success : true, message : user.fullName + "has been created"});                      
+             res.status(201).json({success : true, message : user.fullName + "has been created"});
           }
         });
       }
-   });   
+   });
 });
 
 router.post('/registerToken', function(req, res, next) {

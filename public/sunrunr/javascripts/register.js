@@ -3,7 +3,7 @@ function sendRegisterRequest() {
   let password = $('#password').val();
   let fullName = $('#fullName').val();
   let passwordConfirm = $('#passwordConfirm').val();
-  
+
   // Check to make sure the passwords match
   // FIXME: Check to ensure strong password 
   if (password != passwordConfirm) {
@@ -11,7 +11,7 @@ function sendRegisterRequest() {
     $('#ServerResponse').show();
     return;
   }
-  
+
   $.ajax({
    url: '/users/register',
    type: 'POST',
