@@ -1,6 +1,7 @@
 let express = require('express');
 let router = express.Router();
 let Device = require("../models/device");
+let DeviceData = require("../models/deviceData");
 let fs = require('fs');
 let jwt = require("jwt-simple");
 
@@ -50,6 +51,7 @@ router.get('/status/:devid', function(req, res, next) {
 router.post('/deviceData', function(req, res, next) {
     let responseJson = {
         removed: false,
+        deviceId : "none",
         message : "",
     };
 
@@ -78,8 +80,8 @@ router.post('/deviceData', function(req, res, next) {
         return res.status(400).json(responseJson);
     }
 
-    if ( !req.body.hasOwnProperty("deviceID")) {
-        responseJson.message = "Missing deviceID.";
+    if ( !req.body.hasOwnProperty("deviceId")) {
+        responseJson.message = "Missing deviceId.";
         return res.status(400).json(responseJson);
     }
 
@@ -94,9 +96,31 @@ router.post('/deviceData', function(req, res, next) {
     }
     let time = req.body.time;
     let uv = req.body.uv;
-    let deviceID = req.body.deviceID;
+    let deviceId = req.body.deviceId;
     let APIkey = req.body.APIkey;
 
+
+    // Create a new device with specified id, user email, and randomly generated apikey.
+    let newDeviceData = new DeviceData({
+        deviceId: deviceId,
+        userEmail: email,
+        apikey: deviceApikey
+    });
+
+    // Save device. If successful, return success. If not, return error message.
+    newDeviceData.save(function(err, newDevice) {
+    if (err) {
+      responseJson.message = err;
+      // This following is equivalent to: res.status(400).send(JSON.stringify(responseJson));
+      return res.status(400).json(responseJson);
+    }
+    else {
+      responseJson.removed = true;
+      responseJson.deviceId = req.body.deviceId;
+      responseJson.message = "Device ID " + req.body.deviceId + " data was saved.";
+      return res.status(201).json(responseJson);
+    }
+    });
 
 });
 
