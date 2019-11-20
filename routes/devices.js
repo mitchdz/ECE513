@@ -55,54 +55,54 @@ router.post('/deviceData', function(req, res, next) {
         message : "",
     };
 
-    if ( !req.body.hasOwnProperty("gps_exists")) {
+    if ( !req.body.data.hasOwnProperty("gps_exists")) {
         responseJson.message = "Missing gps_exists.";
         return res.status(400).json(responseJson);
     }
 
-    if ( !req.body.hasOwnProperty("gps_lat")) {
+    if ( !req.body.data.hasOwnProperty("gps_lat")) {
         responseJson.message = "Missing gps_lat.";
         return res.status(400).json(responseJson);
     }
-    if ( !req.body.hasOwnProperty("gps_long")) {
+    if ( !req.body.data.hasOwnProperty("gps_long")) {
         responseJson.message = "Missing gps_long.";
         return res.status(400).json(responseJson);
     }
 
-    if ( !req.body.hasOwnProperty("uv")) {
+    if ( !req.body.data.hasOwnProperty("uv")) {
         responseJson.message = "Missing uv.";
         return res.status(400).json(responseJson);
     }
 
-    if ( !req.body.hasOwnProperty("time")) {
+    if ( !req.body.data.hasOwnProperty("time")) {
         responseJson.message = "Missing time.";
         return res.status(400).json(responseJson);
     }
 
-    if ( !req.body.hasOwnProperty("deviceId")) {
+    if ( !req.body.data.hasOwnProperty("deviceId")) {
         responseJson.message = "Missing deviceId.";
         return res.status(400).json(responseJson);
     }
 
-    if ( !req.body.hasOwnProperty("APIkey")) {
+    if ( !req.body.data.hasOwnProperty("APIkey")) {
         responseJson.message = "Missing APIkey.";
         return res.status(400).json(responseJson);
     }
 
-    if (req.body.gps_exists) {
-        let gps_lat = req.body.gps_location;
-        let gps_long = req.body.gps_long;
+    if (req.body.data.gps_exists) {
+        let gps_lat = req.body.data.gps_location;
+        let gps_long = req.body.data.gps_long;
     }
 
     // Create a new device with specified id, user email, and randomly generated apikey.
     let newDeviceData = new DeviceData({
-        gps_exists: req.body.gps_exists,
-        gps_lat: req.body.gps_lat,
-        gps_long: req.body.gps_long,
-        uv: req.body.uv,
-        time: req.body.time,
-        deviceId: req.body.deviceId,
-        APIkey: req.body.APIkey
+        gps_exists: req.body.data.gps_exists,
+        gps_lat: req.body.data.gps_lat,
+        gps_long: req.body.data.gps_long,
+        uv: req.body.data.uv,
+        time: req.body.data.time,
+        deviceId: req.body.data.deviceId,
+        APIkey: req.body.data.APIkey
     });
 
     // Save device. If successful, return success. If not, return error message.
