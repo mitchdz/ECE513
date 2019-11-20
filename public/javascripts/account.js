@@ -20,10 +20,14 @@ function accountInfoSuccess(data, textSatus, jqXHR) {
     $("#addDeviceForm").before("<li class='collection-item'>ID: " +
       device.deviceId + ", APIKEY: " + device.apikey + 
       " <button id='ping-" + device.deviceId + "' class='waves-effect waves-light btn'>Ping</button> " +
+      " <button id='replace-" + device.deviceId + "' class='waves-effect waves-light btn'>Replace</button> " +
       " </li>");
     $("#ping-"+device.deviceId).click(function(event) {
       pingDevice(event, device.deviceId);
     });
+    $("#replace-"+device.deviceId).click(function(event) {
+      replaceDevice(event, device.deviceId);
+    });    
   }
 }
 
@@ -57,10 +61,14 @@ function registerDevice() {
          $("#addDeviceForm").before("<li class='collection-item'>ID: " +
          $("#deviceId").val() + ", APIKEY: " + data["apikey"] + 
            " <button id='ping-" + $("#deviceId").val() + "' class='waves-effect waves-light btn'>Ping</button> " +
+           " <button id='replace-" + $("#deviceId").val() + "' class='waves-effect waves-light btn'>Replace</button> " +
            "</li>");
          $("#ping-"+$("#deviceId").val()).click(function(event) {
            pingDevice(event, device.deviceId);
          });
+         $("#replace-"+$("#deviceId").val()).click(function(event) {
+          replaceDevice(event, device.deviceId);
+         });    
          hideAddDeviceForm();
        })
        .fail(function(jqXHR, textStatus, errorThrown) {
@@ -73,6 +81,11 @@ function registerDevice() {
          $("#error").html("Error: only alphanumeric characters allowed");
          $("#error").show();    
   }
+
+}
+
+function replaceDevice(event, deviceId) {
+  console.log("IMPLEMENT REPLACE");
 
 }
 
