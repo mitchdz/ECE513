@@ -51,9 +51,7 @@ function refreshActivity(event, deviceId) {
   $.ajax({
     url: '/devices/getData',
     type: 'GET',
-    headers: { 'x-auth': window.localStorage.getItem("authToken") },  
-    contentType: 'application/json',
-    data: JSON.stringify({ deviceId: deviceId }), 
+    headers: " 'x-auth'=" +  window.localStorage.getItem("authToken"),  
     dataType: 'json'
    })
      .done(function (data, textStatus, jqXHR) {
