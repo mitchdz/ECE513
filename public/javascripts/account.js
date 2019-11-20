@@ -28,7 +28,7 @@ function accountInfoSuccess(data, textSatus, jqXHR) {
       " <button id='close-" + device.deviceId + "' class='waves-effect waves-light btn'>Close</button> " +
       " </li>" +
       " </li>");
-    var map = new google.maps.Map(document.getElementById('#map-' + device.deviceId), {zoom: 7, center: {lat:32.221667, lng:-110.926389}});
+    //var map = new google.maps.Map(document.getElementById('#map-' + device.deviceId), {zoom: 7, center: {lat:32.221667, lng:-110.926389}});
     $("#activityForm-"+device.deviceId).slideUp();
     $("#ping-"+device.deviceId).click(function(event) {
       pingDevice(event, device.deviceId);
