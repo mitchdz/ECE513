@@ -16,13 +16,18 @@ function accountInfoSuccess(data, textSatus, jqXHR) {
   $("#main").show();
   
   // Add the devices to the list before the list item for the add device button (link)
-  for (var device of data.devices) {
+  for (let device of data.devices) {
     $("#addDeviceForm").before("<li class='collection-item'>ID: " +
       device.deviceId + ", APIKEY: " + device.apikey + 
       " <button id='ping-" + device.deviceId + "' class='waves-effect waves-light btn'>Ping</button> " +
       " <button id='activity-" + device.deviceId + "' class='waves-effect waves-light btn'>Activity</button> " +
       " <button id='replace-" + device.deviceId + "' class='waves-effect waves-light btn'>Replace</button> " +
+      " <li class='collection-item' id='activityForm-" + device.deviceId + "'>" +
+      " <ol id='ol-" + device.deviceId + ">Hi there!</ol>" +
+      " <button id='close-" + device.deviceId + "' class='waves-effect waves-light btn'>Close</button> " +
+      " </li>" +
       " </li>");
+    $("#activityForm-"+device.deviceId).slideUp();
     $("#ping-"+device.deviceId).click(function(event) {
       pingDevice(event, device.deviceId);
     });
@@ -31,9 +36,22 @@ function accountInfoSuccess(data, textSatus, jqXHR) {
     });    
     $("#activity-"+device.deviceId).click(function(event) {
       activityDevice(event, device.deviceId);
-    });      
+    });
+    $("#close-"+device.deviceId).click(function(event) {
+      closeActivity(event, device.deviceId);
+    });
   }
 }
+
+function activityDevice(event, deviceId) {
+  $("#activityForm-"+deviceId).slideDown();
+}
+
+function closeActivity(event, deviceId) {
+  console.log("YAY");
+  $("#activityForm-"+deviceId).slideUp();
+}
+
 
 function accountInfoError(jqXHR, textStatus, errorThrown) {
   // If authentication error, delete the authToken 
