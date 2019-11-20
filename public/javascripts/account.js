@@ -23,7 +23,8 @@ function accountInfoSuccess(data, textSatus, jqXHR) {
       " <button id='activity-" + device.deviceId + "' class='waves-effect waves-light btn'>Activity</button> " +
       " <button id='replace-" + device.deviceId + "' class='waves-effect waves-light btn'>Replace</button> " +
       " <li class='collection-item' id='activityForm-" + device.deviceId + "'>" +
-      " <ol id='ol-" + device.deviceId + ">Hi there!</ol>" +
+      " <p>" + device.deviceId + " activity</p>" +
+      " <button id='refresh-" + device.deviceId + "' class='waves-effect waves-light btn'>Refresh</button> " +
       " <button id='close-" + device.deviceId + "' class='waves-effect waves-light btn'>Close</button> " +
       " </li>" +
       " </li>");
@@ -40,7 +41,30 @@ function accountInfoSuccess(data, textSatus, jqXHR) {
     $("#close-"+device.deviceId).click(function(event) {
       closeActivity(event, device.deviceId);
     });
+    $("#refresh-"+device.deviceId).click(function(event) {
+      refreshActivity(event, device.deviceId);
+    });
   }
+}
+
+function refreshActivity(event, deviceId) {
+  $.ajax({
+    url: '/devices/getData',
+    type: 'GET',
+    headers: { 'x-auth': window.localStorage.getItem("authToken") },  
+    contentType: 'application/json',
+    data: JSON.stringify({ deviceId: deviceId }), 
+    dataType: 'json'
+   })
+     .done(function (data, textStatus, jqXHR) {
+       console.log(data);
+     })
+     .fail(function(jqXHR, textStatus, errorThrown) {
+       let response = JSON.parse(jqXHR.responseText);
+       $("#error").html("Error: " + response.message);
+       $("#error").show();
+     }); 
+
 }
 
 function activityDevice(event, deviceId) {
@@ -48,7 +72,6 @@ function activityDevice(event, deviceId) {
 }
 
 function closeActivity(event, deviceId) {
-  console.log("YAY");
   $("#activityForm-"+deviceId).slideUp();
 }
 

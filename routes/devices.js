@@ -20,6 +20,33 @@ function getNewApikey() {
   return newApikey;
 }
 
+router.get('/status/getData', function(req, res, next) {
+  let responseJson = { data: [] };
+  DeviceData.find({ deviceId: req.body.deviceId }, function(err, allData) {
+    if (err) {
+      let errorMsg = {"message" : err};
+      res.status(400).json(errorMsg);
+    }
+    else {
+      for(let dev of allData) {
+        responseJson.devices.push({ "deviceId": dev.deviceId,  
+                                    "gps_exists" : dev.gps_exists,
+                                    "gps_lat": dev.gps_lat,
+                                    "gps_long": dev.gps_long,
+                                    "uv": dev.uv,
+                                    "time": dev.time,
+                                    "deviceId": dev.deviceId,
+                                    "APIkey": dev.APIkey
+                                    });
+      }
+    }
+
+    res.status(200).json(responseJson);
+  });
+
+});
+
+
 // GET request return one or "all" devices registered and last time of contact.
 router.get('/status/:devid', function(req, res, next) {
   let deviceId = req.params.devid;
