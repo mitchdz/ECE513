@@ -23,11 +23,12 @@ function accountInfoSuccess(data, textSatus, jqXHR) {
       " <button id='activity-" + device.deviceId + "' class='waves-effect waves-light btn'>Activity</button> " +
       " <button id='replace-" + device.deviceId + "' class='waves-effect waves-light btn'>Replace</button> " +
       " <li class='collection-item' id='activityForm-" + device.deviceId + "'>" +
-      " <p>" + device.deviceId + " activity</p>" +
+      " <div id=map-" + device.deviceId + " class=map> activity</div>" +
       " <button id='refresh-" + device.deviceId + "' class='waves-effect waves-light btn'>Refresh</button> " +
       " <button id='close-" + device.deviceId + "' class='waves-effect waves-light btn'>Close</button> " +
       " </li>" +
       " </li>");
+    var map = new google.maps.Map($('#map-' + device.deviceId), {zoom: 7, center: {lat:32.221667, lng:-110.926389}});
     $("#activityForm-"+device.deviceId).slideUp();
     $("#ping-"+device.deviceId).click(function(event) {
       pingDevice(event, device.deviceId);
