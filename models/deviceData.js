@@ -2,6 +2,7 @@ var db = require("../devicedb");
 
 var deviceDataSchema = new db.Schema({
     gps_exists: { type: Boolean, required: true },
+    gps_speed:  { type: Number, required: true },
     gps_lat:    { type: Number, required: true },
     gps_long:   { type: Number, required: true },
     uv:         { type: Number, required: true },

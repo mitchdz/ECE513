@@ -23,7 +23,8 @@ function accountInfoSuccess(data, textSatus, jqXHR) {
       " <button id='activity-" + device.deviceId + "' class='waves-effect waves-light btn'>Activity</button> " +
       " <button id='replace-" + device.deviceId + "' class='waves-effect waves-light btn'>Replace</button> " +
       " <li class='collection-item' id='activityForm-" + device.deviceId + "'>" +
-      " <div id=map-" + device.deviceId + " class=map> activity</div>" +
+      " <div id=map-" + device.deviceId + " class=map> most recent data:</div>" +
+      " <p id=data-" + device.deviceId + "></p>" +
       " <button id='refresh-" + device.deviceId + "' class='waves-effect waves-light btn'>Refresh</button> " +
       " <button id='close-" + device.deviceId + "' class='waves-effect waves-light btn'>Close</button> " +
       " </li>" +
@@ -56,7 +57,22 @@ function refreshActivity(event, deviceId) {
     dataType: 'json'
    })
      .done(function (data, textStatus, jqXHR) {
-       console.log(data);
+      //  console.log(data);
+       for(let datapoint of data.data) {
+        // console.log(datapoint);
+
+        let devicesList = { data: [] };
+        if (datapoint.deviceId == deviceId) {
+          let latitude = datapoint.gps_lat;
+          let longitude = datapoint.gps_long;
+
+          $('#data-'+deviceId).text("longitude: " + longitude +
+                                    " latitude: " + latitude +
+                                    " gps_speed: " + datapoint.gps_speed +
+                                    " uv: " + datapoint.uv);
+        }
+       }
+
      })
      .fail(function(jqXHR, textStatus, errorThrown) {
        let response = JSON.parse(jqXHR.responseText);
