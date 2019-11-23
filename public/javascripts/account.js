@@ -12,7 +12,11 @@ function sendReqForAccountInfo() {
 function initMap()
 {
 	$('.map').each(function (index, Element) {
-		Element.innerHTML = "Hello?";
+		map = new google.maps.Map(Element, 
+		{
+			center: {lat:32.221667, lng:-110.926389},
+			zoom: 8
+		});
 
 	    /*var coords = $(Element).text().split(",");
 	    if (coords.length != 3) {
