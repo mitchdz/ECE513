@@ -13,12 +13,30 @@ function sendReqForAccountInfo() {
 
 function initMap()
 {
-	document.querySelectorAll('.map').forEach(function(mapElement) {
-		maps.push(new google.maps.Map(mapElement, 
-		{
-			center: {lat:32.221667, lng:-110.926389},
-			zoom: 8
-		}));
+	$('.map').each(function (index, Element) {
+	    var coords = $(Element).text().split(",");
+	    if (coords.length != 3) {
+	        $(this).display = "none";
+	        return;
+	    }
+	    var latlng = new google.maps.LatLng({lat:32.221667, lng:-110.926389});
+	    var myOptions = {
+	        zoom: 8,
+	        center: latlng,
+	        mapTypeId: google.maps.MapTypeId.ROADMAP,
+	        disableDefaultUI: false,
+	        mapTypeControl: true,
+	        zoomControl: true,
+	        zoomControlOptions: {
+	            style: google.maps.ZoomControlStyle.SMALL
+	        }
+	    };
+	    var map = new google.maps.Map(Element, myOptions);
+
+	    var marker = new google.maps.Marker({
+	        position: latlng,
+	        map: map
+	    });
 	});
 }
 
