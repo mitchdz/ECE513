@@ -14,7 +14,7 @@ function sendReqForAccountInfo() {
 function initMap()
 {
 	document.querySelectorAll('.map').forEach(function(mapElement) {
-		maps.push(new google.maps.Map(document.getElementById(mapElement), 
+		maps.push(new google.maps.Map(mapElement, 
 		{
 			center: {lat:32.221667, lng:-110.926389},
 			zoom: 8
