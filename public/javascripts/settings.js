@@ -15,6 +15,10 @@ function accountInfoSuccess(data, textSatus, jqXHR) {
   $("#lastAccess").html(data.lastAccess);
   $("#main").show();
   
+  
+
+
+
   // Add the devices to the list before the list item for the add device button (link)
   for (let device of data.devices) {
     $("#addDeviceForm").before("<li class='collection-item'>ID: " +
@@ -175,17 +179,21 @@ function pingDevice(event, deviceId) {
 }
 
 // Show add device form and hide the add device button (really a link)
-function showAddDeviceForm() {
-  $("#newPassword").val("");        // Clear the input for the device ID
-  $("#addDeviceControl").hide();   // Hide the add device link
-  $("#addDeviceForm").slideDown();  // Show the add device form
+function showChangePasswordForm() {
+  $("#" + formName + "Id").val("");        // Clear the input for the device ID
+  $("#changePasswordControl").hide();   // Hide the add device link
+  $("#changePasswordForm").slideDown();  // Show the add device form
 }
 
 // Hides the add device form and shows the add device button (link)
-function hideAddDeviceForm() {
-  $("#addDeviceControl").show();  // Hide the add device link
+function hideChangePasswordForm() {
+  $("#changePasswordControl").show();  // Hide the add device link
   $("#addDeviceForm").slideUp();  // Show the add device form
   $("#error").hide();
+}
+
+function updatePassword() {
+  //TODO: send request to update password
 }
 
 // Handle authentication on page load
@@ -200,7 +208,8 @@ $(function() {
   }
   
   // Register event listeners
-  $("#addDevice").click(showAddDeviceForm);
-  $("#registerDevice").click(registerDevice);  
-  $("#cancel").click(hideAddDeviceForm);  
+  $("#changePassword").click(showChangePasswordForm);
+  $("#changePasswordBtn").click(updatePassword);  
+  $("#cancel").click(hideChangePasswordForm);  
+
 });

@@ -12,16 +12,25 @@ function sendRegisterRequest() {
     return;
   }
 
+  // minimum 8 characters, can be any alphanumeric
 
-  $.ajax({
-   url: '/users/register',
-   type: 'POST',
-   contentType: 'application/json',
-   data: JSON.stringify({email:email, fullName:fullName, password:password}),
-   dataType: 'json'
-  })
-    .done(registerSuccess)
-    .fail(registerError);
+  var alphanumericTest = /^[a-zA-Z0-9_]{8,}$/;
+  if (alphanumericTest.test(password)) {
+    $.ajax({
+      url: '/users/register',
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({email:email, fullName:fullName, password:password}),
+      dataType: 'json'
+     })
+       .done(registerSuccess)
+       .fail(registerError);
+  }
+  else {
+    $('#ServerResponse').html("<span class='red-text text-darken-2'>Password needs to be alphanumeric and at least 8 characters.</span>");
+    $('#ServerResponse').show();
+    return;
+  }
 }
 
 function registerSuccess(data, textStatus, jqXHR) {
