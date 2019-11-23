@@ -12,7 +12,9 @@ function sendReqForAccountInfo() {
 function initMap()
 {
 	$('.map').each(function (index, Element) {
-	    var coords = $(Element).text().split(",");
+		Element.text("Hello?");
+
+	    /*var coords = $(Element).text().split(",");
 	    if (coords.length != 3) {
 	        $(this).display = "none";
 	        return;
@@ -34,7 +36,7 @@ function initMap()
 	    var marker = new google.maps.Marker({
 	        position: latlng,
 	        map: map
-	    });
+	    });*/
 	});
 }
 
