@@ -93,6 +93,12 @@ function refreshActivity(event, deviceId) {
 			let newPosition = {lat: latitude, lng: longitude}
 			let marker = new google.maps.Marker({position: newPosition, map: maps[deviceId]});
 
+			marker.setTitle(datapoint.time);
+			marker.setLabel("UV index:" + datapoint.uv);
+			marker.setClickable(true);
+			marker.setDraggable(false);
+
+
         }
 
        }
