@@ -19,7 +19,7 @@ function initMap()
 		map = new google.maps.Map(Element, 
 		{
 			center: {lat:32.221667, lng:-110.926389},
-			zoom: 8
+			zoom: 12
 		});
 
 		maps[devid] = map;
@@ -40,7 +40,7 @@ function accountInfoSuccess(data, textSatus, jqXHR) {
       " <button id='activity-" + device.deviceId + "' class='waves-effect waves-light btn'>Activity</button> " +
       " <button id='replace-" + device.deviceId + "' class='waves-effect waves-light btn'>Replace</button> " +
       " <li class='collection-item' id='activityForm-" + device.deviceId + "'>" +
-      " <div id=map-" + device.deviceId + " class=map style=\"height: 20vh; max-width=40vw;\">" + device.deviceId + "</div>" +
+      " <div id=map-" + device.deviceId + " class=map style=\"height: 30vh; max-width:40vw;\">" + device.deviceId + "</div>" +
       " <p id=data-" + device.deviceId + "></p>" +
       " <button id='refresh-" + device.deviceId + "' class='waves-effect waves-light btn'>Refresh</button> " +
       " <button id='close-" + device.deviceId + "' class='waves-effect waves-light btn'>Close</button> " +
