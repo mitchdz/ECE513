@@ -11,10 +11,12 @@ function sendReqForAccountInfo() {
 
 function initMap()
 {
-	map = new google.maps.Map(document.getElementById('map'), 
-	{
-		center: {lat:32.221667, lng:-110.926389},
-		zoom: 8
+	document.querySelectorAll('.map').forEach(function(mapElement) {
+		let map = new google.maps.Map(document.getElementById(mapElement), 
+		{
+			center: {lat:32.221667, lng:-110.926389},
+			zoom: 8
+		});
 	});
 }
 
@@ -32,7 +34,7 @@ function accountInfoSuccess(data, textSatus, jqXHR) {
       " <button id='activity-" + device.deviceId + "' class='waves-effect waves-light btn'>Activity</button> " +
       " <button id='replace-" + device.deviceId + "' class='waves-effect waves-light btn'>Replace</button> " +
       " <li class='collection-item' id='activityForm-" + device.deviceId + "'>" +
-      " <div id=map-" + device.deviceId + " class=map> most recent data:</div>" +
+      " <div id=map-" + device.deviceId + " class=map style=\"height: 200px\"></div>" +
       " <p id=data-" + device.deviceId + "></p>" +
       " <button id='refresh-" + device.deviceId + "' class='waves-effect waves-light btn'>Refresh</button> " +
       " <button id='close-" + device.deviceId + "' class='waves-effect waves-light btn'>Close</button> " +
