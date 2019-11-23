@@ -1,5 +1,3 @@
-var maps = []
-
 function sendReqForAccountInfo() {
   $.ajax({
     url: '/users/account',
@@ -78,6 +76,8 @@ function accountInfoSuccess(data, textSatus, jqXHR) {
       refreshActivity(event, device.deviceId);
     });
   }
+
+  initMap();
 }
 
 function refreshActivity(event, deviceId) {
