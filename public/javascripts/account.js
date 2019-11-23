@@ -1,3 +1,5 @@
+var maps = {}
+
 function sendReqForAccountInfo() {
   $.ajax({
     url: '/users/account',
@@ -12,35 +14,15 @@ function sendReqForAccountInfo() {
 function initMap()
 {
 	$('.map').each(function (index, Element) {
+		devid = Element.innerHTML
+
 		map = new google.maps.Map(Element, 
 		{
 			center: {lat:32.221667, lng:-110.926389},
 			zoom: 8
 		});
 
-	    /*var coords = $(Element).text().split(",");
-	    if (coords.length != 3) {
-	        $(this).display = "none";
-	        return;
-	    }
-	    var latlng = new google.maps.LatLng({lat:32.221667, lng:-110.926389});
-	    var myOptions = {
-	        zoom: 8,
-	        center: latlng,
-	        mapTypeId: google.maps.MapTypeId.ROADMAP,
-	        disableDefaultUI: false,
-	        mapTypeControl: true,
-	        zoomControl: true,
-	        zoomControlOptions: {
-	            style: google.maps.ZoomControlStyle.SMALL
-	        }
-	    };
-	    var map = new google.maps.Map(Element, myOptions);
-
-	    var marker = new google.maps.Marker({
-	        position: latlng,
-	        map: map
-	    });*/
+		maps[devid] = map;
 	});
 }
 
@@ -58,7 +40,7 @@ function accountInfoSuccess(data, textSatus, jqXHR) {
       " <button id='activity-" + device.deviceId + "' class='waves-effect waves-light btn'>Activity</button> " +
       " <button id='replace-" + device.deviceId + "' class='waves-effect waves-light btn'>Replace</button> " +
       " <li class='collection-item' id='activityForm-" + device.deviceId + "'>" +
-      " <div id=map-" + device.deviceId + " class=map style=\"height: 200px; width=300px\"></div>" +
+      " <div id=map-" + device.deviceId + " class=map style=\"height: 200px; width=300px;\">" + device.deviceId + "</div>" +
       " <p id=data-" + device.deviceId + "></p>" +
       " <button id='refresh-" + device.deviceId + "' class='waves-effect waves-light btn'>Refresh</button> " +
       " <button id='close-" + device.deviceId + "' class='waves-effect waves-light btn'>Close</button> " +
