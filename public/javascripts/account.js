@@ -12,7 +12,7 @@ function sendReqForAccountInfo() {
 function initMap()
 {
 	$('.map').each(function (index, Element) {
-		Element.text("Hello?");
+		Element.innerHTML = "Hello?";
 
 	    /*var coords = $(Element).text().split(",");
 	    if (coords.length != 3) {
