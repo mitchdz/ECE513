@@ -148,7 +148,7 @@ function registerDevice() {
 
 }
 
-//TODO: update account information
+
 
 
 function replaceDevice(event, deviceId) {
@@ -176,7 +176,7 @@ function pingDevice(event, deviceId) {
 
 // Show add device form and hide the add device button (really a link)
 function showAddDeviceForm() {
-  $("#newPassword").val("");        // Clear the input for the device ID
+  $("#deviceId").val("");        // Clear the input for the device ID
   $("#addDeviceControl").hide();   // Hide the add device link
   $("#addDeviceForm").slideDown();  // Show the add device form
 }

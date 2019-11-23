@@ -210,6 +210,6 @@ $(function() {
   // Register event listeners
   $("#changePassword").click(showChangePasswordForm);
   $("#changePasswordBtn").click(updatePassword);  
-  $("#cancel").click(hideChangePasswordForm);  
+  $("#passwordCancel").click(hideChangePasswordForm);  
 
 });
