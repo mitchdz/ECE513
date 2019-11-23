@@ -82,14 +82,19 @@ function refreshActivity(event, deviceId) {
 
         let devicesList = { data: [] };
         if (datapoint.deviceId == deviceId) {
-          let latitude = datapoint.gps_lat;
-          let longitude = datapoint.gps_long;
+			let latitude = datapoint.gps_lat;
+			let longitude = datapoint.gps_long;
 
-          $('#data-'+deviceId).text("longitude: " + longitude +
+			$('#data-'+deviceId).text("longitude: " + longitude +
                                     " latitude: " + latitude +
                                     " gps_speed: " + datapoint.gps_speed +
                                     " uv: " + datapoint.uv);
+
+			let newPosition = {lat: latitude, lng: longitude}
+			let marker = new google.maps.Marker({position: newPosition, map: maps[deviceId]});
+
         }
+
        }
 
      })
