@@ -9,6 +9,15 @@ function sendReqForAccountInfo() {
     .fail(accountInfoError);
 }
 
+function initMap()
+{
+	map = new google.maps.Map(document.getElementById('map'), 
+	{
+		center: {lat:32.221667, lng:-110.926389},
+		zoom: 8
+	});
+}
+
 function accountInfoSuccess(data, textSatus, jqXHR) {
   $("#email").html(data.email);
   $("#fullName").html(data.fullName);
