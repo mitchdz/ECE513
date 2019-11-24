@@ -26,6 +26,24 @@ function initMap()
 	});
 }
 
+function getFormattedDate(date)
+{
+	datetimeStr = " ";
+	datetimeStr += date.getMonth();
+	datetimeStr += "/";
+	datetimeStr += date.getDay();
+	datetimeStr += "/";
+	datetimeStr += date.getYear();
+	datetimeStr += " ";
+	datetimeStr += date.getHour();
+	datetimeStr += ":";
+	datetimeStr += date.getMinute();
+	datetimeStr += ":";
+	datetimeStr += date.getSecond();
+
+	return datetimeStr;
+}
+
 function accountInfoSuccess(data, textSatus, jqXHR) {
   $("#email").html(data.email);
   $("#fullName").html(data.fullName);
@@ -93,7 +111,7 @@ function refreshActivity(event, deviceId) {
 			let newPosition = {lat: latitude, lng: longitude}
 			let marker = new google.maps.Marker({position: newPosition, map: maps[deviceId]});
 
-			marker.setTitle(datapoint.time.toLocaleDateString("en-US") + "\nUV index:" + datapoint.uv);
+			marker.setTitle(getFormattedDate(datapoint.time) + "\nUV index:" + datapoint.uv);
 			marker.setLabel();
 			marker.setClickable(true);
 			marker.setDraggable(false);
