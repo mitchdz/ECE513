@@ -15,7 +15,7 @@
 	<script src="/javascripts/signout.js"></script>
 	<link href="/stylesheets/sunrunr.css" rel="stylesheet">
 	<!--<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBqemuwCwKHsbKw_hskuDIkFv24STdqN5k&callback=initMap"></script>-->
-	<script src="/javascripts/account.js" defer></script>
+	<script src="/javascripts/settings.js" defer></script>
 
 	 <!-- Let browser know website is optimized for mobile -->
 	 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -45,21 +45,40 @@
 					<h5>Account details</h5>
 				</li>
 				<li class="collection-item">Email: <span id="email"></span></li>
+				<li class="collection-item" id="changeEmailForm">
+					<label for="newEmail">New Email:</label>
+					<input type="text" id="newEmail" name="newEmail" col="30">				
+					<button id="updateEmail" class="waves-effect waves-light btn">Update</button> 
+					<button id="emailCancel" class="waves-effect waves-light btn">Cancel</button> 
+				</li>
+				<li class="collection-item" id="changeEmailControl"><a href="#!" id="changeEmail">Change Email</a></li>
+
+
 				<li class="collection-item">Name: <span id="fullName"></span></li>
+				<li class="collection-item" id="changeNameForm">
+					<label for="newName">New Name:</label>
+					<input type="text" id="newName" name="newName" col="30">				
+					<button id="updateName" class="waves-effect waves-light btn">Update</button> 
+					<button id="nameCancel" class="waves-effect waves-light btn">Cancel</button> 
+				</li>
+				<li class="collection-item" id="changenameControl"><a href="#!" id="changeName">Change Name</a></li>
+
+
+				<li class="collection-item">Password: *******</li>
 				<li class="collection-item" id="changePasswordForm">
 					<label for="currentPassword">Current Password:</label>
-					<input type="text" id="currentPassword" name="currentPassword" col="30">
+					<input type="password" id="currentPassword" name="currentPassword" col="30">
 
 					<label for="newPassword">New Password:</label>
-					<input type="text" id="newPassword" name="newPassword" col="30">
+					<input type="password" id="newPassword" name="newPassword" col="30">
 
 					<label for="confirmPassword">Confirm Password:</label>
-					<input type="text" id="confirmPassword" name="confirmPassword" col="30">					
+					<input type="password" id="confirmPassword" name="confirmPassword" col="30">					
 
-					<button id="registerDevice" class="waves-effect waves-light btn">Register</button> 
+					<button id="updatePassword" class="waves-effect waves-light btn">Update</button> 
 					<button id="passwordCancel" class="waves-effect waves-light btn">Cancel</button> 
 				</li>
-				<li class="collection-item" id="changePasswordControl"><a href="#!" id="changePassword">Add Device</a></li>
+				<li class="collection-item" id="changePasswordControl"><a href="#!" id="changePassword">Change Password</a></li>
 			</ul>
 			<div class='red-text text-darken-2' id="error"></div>
 			<div class='red-text text-darken-2' id="error"></div>

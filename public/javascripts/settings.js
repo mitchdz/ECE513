@@ -14,86 +14,7 @@ function accountInfoSuccess(data, textSatus, jqXHR) {
   $("#fullName").html(data.fullName);
   $("#lastAccess").html(data.lastAccess);
   $("#main").show();
-  
-  
-
-
-
-  // Add the devices to the list before the list item for the add device button (link)
-  for (let device of data.devices) {
-    $("#addDeviceForm").before("<li class='collection-item'>ID: " +
-      device.deviceId + ", APIKEY: " + device.apikey + 
-      " <button id='ping-" + device.deviceId + "' class='waves-effect waves-light btn'>Ping</button> " +
-      " <button id='activity-" + device.deviceId + "' class='waves-effect waves-light btn'>Activity</button> " +
-      " <button id='replace-" + device.deviceId + "' class='waves-effect waves-light btn'>Replace</button> " +
-      " <li class='collection-item' id='activityForm-" + device.deviceId + "'>" +
-      " <div id=map-" + device.deviceId + " class=map> most recent data:</div>" +
-      " <p id=data-" + device.deviceId + "></p>" +
-      " <button id='refresh-" + device.deviceId + "' class='waves-effect waves-light btn'>Refresh</button> " +
-      " <button id='close-" + device.deviceId + "' class='waves-effect waves-light btn'>Close</button> " +
-      " </li>" +
-      " </li>");
-    //var map = new google.maps.Map(document.getElementById('#map-' + device.deviceId), {zoom: 7, center: {lat:32.221667, lng:-110.926389}});
-    $("#activityForm-"+device.deviceId).slideUp();
-    $("#ping-"+device.deviceId).click(function(event) {
-      pingDevice(event, device.deviceId);
-    });
-    $("#replace-"+device.deviceId).click(function(event) {
-      replaceDevice(event, device.deviceId);
-    });    
-    $("#activity-"+device.deviceId).click(function(event) {
-      activityDevice(event, device.deviceId);
-    });
-    $("#close-"+device.deviceId).click(function(event) {
-      closeActivity(event, device.deviceId);
-    });
-    $("#refresh-"+device.deviceId).click(function(event) {
-      refreshActivity(event, device.deviceId);
-    });
-  }
 }
-
-function refreshActivity(event, deviceId) {
-  $.ajax({
-    url: '/devices/getData',
-    type: 'GET',
-    headers: " 'x-auth'=" +  window.localStorage.getItem("authToken"),  
-    dataType: 'json'
-   })
-     .done(function (data, textStatus, jqXHR) {
-      //  console.log(data);
-       for(let datapoint of data.data) {
-        // console.log(datapoint);
-
-        let devicesList = { data: [] };
-        if (datapoint.deviceId == deviceId) {
-          let latitude = datapoint.gps_lat;
-          let longitude = datapoint.gps_long;
-
-          $('#data-'+deviceId).text("longitude: " + longitude +
-                                    " latitude: " + latitude +
-                                    " gps_speed: " + datapoint.gps_speed +
-                                    " uv: " + datapoint.uv);
-        }
-       }
-
-     })
-     .fail(function(jqXHR, textStatus, errorThrown) {
-       let response = JSON.parse(jqXHR.responseText);
-       $("#error").html("Error: " + response.message);
-       $("#error").show();
-     }); 
-
-}
-
-function activityDevice(event, deviceId) {
-  $("#activityForm-"+deviceId).slideDown();
-}
-
-function closeActivity(event, deviceId) {
-  $("#activityForm-"+deviceId).slideUp();
-}
-
 
 function accountInfoError(jqXHR, textStatus, errorThrown) {
   // If authentication error, delete the authToken 
@@ -108,79 +29,13 @@ function accountInfoError(jqXHR, textStatus, errorThrown) {
   } 
 }
 
-// Registers the specified device with the server.
-function registerDevice() {
-  var alphanumericTest = /^[a-zA-Z0-9_]*$/;
-  if (alphanumericTest.test($('#deviceId').val())) {
-    $.ajax({
-      url: '/devices/register',
-      type: 'POST',
-      headers: { 'x-auth': window.localStorage.getItem("authToken") },  
-      contentType: 'application/json',
-      data: JSON.stringify({ deviceId: $("#deviceId").val(), email:$("#email").text() }), 
-      dataType: 'json'
-     })
-       .done(function (data, textStatus, jqXHR) {
-         // Add new device to the device list
-         $("#addDeviceForm").before("<li class='collection-item'>ID: " +
-         $("#deviceId").val() + ", APIKEY: " + data["apikey"] + 
-           " <button id='ping-" + $("#deviceId").val() + "' class='waves-effect waves-light btn'>Ping</button> " +
-           " <button id='activity-" + $("#deviceId").val() + "' class='waves-effect waves-light btn'>Activity</button> " +
-           " <button id='replace-" + $("#deviceId").val() + "' class='waves-effect waves-light btn'>Replace</button> " +
-           "</li>");
-         $("#ping-"+$("#deviceId").val()).click(function(event) {
-           pingDevice(event, device.deviceId);
-         });
-         $("#replace-"+$("#deviceId").val()).click(function(event) {
-          replaceDevice(event, device.deviceId);
-         });    
-         $("#activity-"+$("#deviceId").val()).click(function(event) {
-          activityDevice(event, device.deviceId);
-         });             
-         hideAddDeviceForm();
-       })
-       .fail(function(jqXHR, textStatus, errorThrown) {
-         let response = JSON.parse(jqXHR.responseText);
-         $("#error").html("Error: " + response.message);
-         $("#error").show();
-       }); 
-  }
-  else {
-         $("#error").html("Error: only alphanumeric characters allowed");
-         $("#error").show();    
-  }
-
-}
-
-//TODO: update account information
-
-
-function replaceDevice(event, deviceId) {
-  console.log("IMPLEMENT REPLACE");
-
-}
-
-function pingDevice(event, deviceId) {
-   $.ajax({
-        url: '/devices/ping',
-        type: 'POST',
-        headers: { 'x-auth': window.localStorage.getItem("authToken") },   
-        data: { 'deviceId': deviceId }, 
-        responseType: 'json',
-        success: function (data, textStatus, jqXHR) {
-            console.log("Pinged.");
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            var response = JSON.parse(jqXHR.responseText);
-            $("#error").html("Error: " + response.message);
-            $("#error").show();
-        }
-    }); 
-}
-
 // Show add device form and hide the add device button (really a link)
 function showChangePasswordForm() {
-  $("#" + formName + "Id").val("");        // Clear the input for the device ID
+  hideEmailForm();
+  hideNameForm();
+  $("#currentPassword").val("");        // Clear the input for the device ID
+  $("#newPassword").val("");        // Clear the input for the device ID
+  $("#confirmPassword").val("");        // Clear the input for the device ID    
   $("#changePasswordControl").hide();   // Hide the add device link
   $("#changePasswordForm").slideDown();  // Show the add device form
 }
@@ -188,12 +43,84 @@ function showChangePasswordForm() {
 // Hides the add device form and shows the add device button (link)
 function hideChangePasswordForm() {
   $("#changePasswordControl").show();  // Hide the add device link
-  $("#addDeviceForm").slideUp();  // Show the add device form
+  $("#changePasswordForm").slideUp();  // Show the add device form
   $("#error").hide();
 }
 
+// Show add device form and hide the add device button (really a link)
+function showEmailForm() {
+  hideChangePasswordForm();
+  hideNameForm();
+  $("#newEmail").val("");        // Clear the input for the device ID 
+  $("#changeEmailControl").hide();   // Hide the add device link
+  $("#changeEmailForm").slideDown();  // Show the add device form
+}
+
+// Hides the add device form and shows the add device button (link)
+function hideEmailForm() {
+  $("#changeEmailControl").show();  // Hide the add device link
+  $("#changeEmailForm").slideUp();  // Show the add device form
+  $("#error").hide();
+}
+
+// Show add device form and hide the add device button (really a link)
+function showNameForm() {
+  hideEmailForm();
+  hideChangePasswordForm();
+  $("#newName").val("");        // Clear the input for the device ID 
+  $("#changeNameControl").hide();   // Hide the add device link
+  $("#changeNameForm").slideDown();  // Show the add device form
+}
+
+// Hides the add device form and shows the add device button (link)
+function hideNameForm() {
+  $("#changeNameControl").show();  // Hide the add device link
+  $("#changeNameForm").slideUp();  // Show the add device form
+  $("#error").hide();
+}
+
+
+
 function updatePassword() {
-  //TODO: send request to update password
+  //TODO: validate password
+
+  let password = $("#newPassword").val();
+  console.log(password);
+
+  $.ajax({
+    type: "PUT",
+    url: "/users/updatePassword",
+    headers: { 'x-auth': window.localStorage.getItem("authToken") },
+    data: JSON.stringify({"password": password}),
+    contentType: "application/json"
+  }).done(function(data) {
+    console.log("updated password!");
+  }).fail(function(jqXHR) {
+    $("#error").html("The user coudl not be updated.");
+  });
+}
+
+function updateEmail() {
+
+}
+
+function updateName() {
+  let inputFullName = $("#newName").val();
+  console.log(inputFullName);
+
+  $.ajax({
+    type: "PUT",
+    url: "/users/updateName",
+    headers: { 'x-auth': window.localStorage.getItem("authToken") },
+    data: JSON.stringify({"name": inputFullName}),
+    contentType: "application/json"
+  }).done(function(data) {
+    console.log("updated name!");
+    location.reload();
+  }).fail(function(jqXHR) {
+    $("#error").html("The user coudl not be updated.");
+  });
+
 }
 
 // Handle authentication on page load
@@ -207,9 +134,18 @@ $(function() {
     sendReqForAccountInfo();
   }
   
-  // Register event listeners
+  // Register event listeners for password
   $("#changePassword").click(showChangePasswordForm);
-  $("#changePasswordBtn").click(updatePassword);  
+  $("#updatePassword").click(updatePassword);  
   $("#passwordCancel").click(hideChangePasswordForm);  
+
+  $("#changeEmail").click(showEmailForm);
+  $("#updateEmail").click(updateEmail);  
+  $("#emailCancel").click(hideEmailForm);  
+
+  $("#changeName").click(showNameForm);
+  $("#updateName").click(updateName);  
+  $("#nameCancel").click(hideNameForm);  
+
 
 });

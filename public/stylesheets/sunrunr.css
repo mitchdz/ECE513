@@ -22,6 +22,10 @@
    display: none;
 }
 
+#changePasswordForm, #main, #error , #changeEmailForm, #changeNameForm{
+    display: none;
+}
+
 .input-field input {
    color: white;
 }

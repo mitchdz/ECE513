@@ -2,6 +2,7 @@ let express = require('express');
 let router = express.Router();
 let User = require("../models/users");
 let Device = require("../models/device");
+let DeviceData = require("../models/deviceData");
 let fs = require('fs');
 let bcrypt = require("bcryptjs");
 let jwt = require("jwt-simple");
@@ -92,6 +93,114 @@ router.post('/registerToken', function(req, res, next) {
       return res.status(401).json({success: false, message: "Invalid authentication token."});
    }
 });
+
+
+router.put("/updateName", function(req, res) {
+   // Check for authentication token in x-auth header
+   if (!req.headers["x-auth"]) {
+      return res.status(401).json({success: false, message: "No authentication token"});
+   }
+   
+   var authToken = req.headers["x-auth"];
+   
+   try {
+      var decodedToken = jwt.decode(authToken, secret);
+      
+      User.findOne({email: decodedToken.email}, function(err, user) {
+         user.fullName = req.body.name;
+         User.findByIdAndUpdate(user._id, user, function(err, user) {
+            if (err) {
+               res.status(400).send(err);
+            }
+            else if (user) {
+               res.sendStatus(204);
+            }
+            else {
+               res.sendStatus(404);
+            }
+         });
+      });
+   }
+   catch (ex) {
+      return res.status(401).json({success: false, message: "Invalid authentication token."});
+   }
+});
+
+router.put("/updatePassword", function(req, res) {
+   // Check for authentication token in x-auth header
+   if (!req.headers["x-auth"]) {
+      return res.status(401).json({success: false, message: "No authentication token"});
+   }
+   
+   var authToken = req.headers["x-auth"];
+
+
+   try {
+      bcrypt.hash(req.body.password, 10, function(err, hash) {
+         if (err) {
+            res.status(400).json({success : false, message : err.errmsg, error:"bcryptjs error"});
+         }
+         else {
+            var decodedToken = jwt.decode(authToken, secret);
+            
+            User.findOne({email: decodedToken.email}, function(err, user) {
+               user.passwordHash = hash;
+               User.findByIdAndUpdate(user._id, user, function(err, user) {
+                  if (err) {
+                     res.status(400).send(err);
+                  }
+                  else if (user) {
+                     res.sendStatus(204);
+                  }
+                  else {
+                     res.sendStatus(404);
+                  }
+               });
+            });
+         }
+      });
+   }
+   catch (ex) {
+      return res.status(401).json({success: false, message: "Invalid authentication token."});
+   }
+});
+
+
+
+
+router.put("/updateName", function(req, res) {
+   // Check for authentication token in x-auth header
+   if (!req.headers["x-auth"]) {
+      return res.status(401).json({success: false, message: "No authentication token"});
+   }
+   
+   var authToken = req.headers["x-auth"];
+   
+   try {
+      var decodedToken = jwt.decode(authToken, secret);
+      
+      User.findOne({email: decodedToken.email}, function(err, user) {
+         user.fullName = req.body.name;
+         User.findByIdAndUpdate(user._id, user, function(err, user) {
+            if (err) {
+               res.status(400).send(err);
+            }
+            else if (user) {
+               res.sendStatus(204);
+            }
+            else {
+               res.sendStatus(404);
+            }
+         });
+      });
+   }
+   catch (ex) {
+      return res.status(401).json({success: false, message: "Invalid authentication token."});
+   }
+});
+
+
+
 
 
 router.get("/account" , function(req, res) {
