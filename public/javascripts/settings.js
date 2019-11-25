@@ -85,29 +85,57 @@ function updatePassword() {
   //TODO: validate password
 
   let password = $("#newPassword").val();
-  console.log(password);
+  let passwordConfirm = $('#confirmPassword').val();
+
+  if (password == passwordConfirm) {
+    $.ajax({
+      type: "PUT",
+      url: "/users/updatePassword",
+      headers: { 'x-auth': window.localStorage.getItem("authToken") },
+      data: JSON.stringify({"password": password}),
+      contentType: "application/json"
+    }).done(function(data) {
+      window.localStorage.removeItem('authToken');
+      window.location = "index.html";
+    }).fail(function(jqXHR) {
+      $("#error").html("The user could not be updated.");
+      $("#error").show();
+    });
+  }
+  else {
+    $("#error").html("The passwords do not match.");
+    $("#error").show();
+  }
+}
+
+function updateEmail() {
+  let inputEmail = $("#newEmail").val();
 
   $.ajax({
+    url: "/users/updateEmail",
     type: "PUT",
-    url: "/users/updatePassword",
     headers: { 'x-auth': window.localStorage.getItem("authToken") },
-    data: JSON.stringify({"password": password}),
+    data: JSON.stringify({"email": inputEmail}),
     contentType: "application/json"
   }).done(function(data) {
     window.localStorage.removeItem('authToken');
     window.location = "index.html";
+    // location.reload();
   }).fail(function(jqXHR) {
-    $("#error").html("The user could not be updated.");
+    if (jqXHR.status == 400) {
+      $("#error").html("That email already exists.");
+      $('#error').show();
+    }
+    else {
+      $("#error").html("The user email could not be updated.");
+      $('#error').show();
+    }
   });
-}
-
-function updateEmail() {
 
 }
 
 function updateName() {
   let inputFullName = $("#newName").val();
-  console.log(inputFullName);
 
   $.ajax({
     type: "PUT",
@@ -116,10 +144,9 @@ function updateName() {
     data: JSON.stringify({"name": inputFullName}),
     contentType: "application/json"
   }).done(function(data) {
-    console.log("updated name!");
     location.reload();
   }).fail(function(jqXHR) {
-    $("#error").html("The user coudl not be updated.");
+    $("#error").html("The user could not be updated.");
   });
 
 }

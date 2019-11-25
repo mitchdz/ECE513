@@ -126,6 +126,58 @@ router.put("/updateName", function(req, res) {
    }
 });
 
+
+router.put("/updateEmail", function(req, res) {
+   // Check for authentication token in x-auth header
+   if (!req.headers["x-auth"]) {
+      return res.status(401).json({success: false, message: "No authentication token"});
+   }
+   
+   var authToken = req.headers["x-auth"];
+   
+   try {
+      var decodedToken = jwt.decode(authToken, secret);
+      
+
+      User.findOne({email: req.body.email}, function(err, user) {
+         if (user) {
+            return res.status(400).json({success: false, message: "user already exists."});
+         }
+      });
+
+      User.findOne({email: decodedToken.email}, function(err, user) {
+         // update user email in the users db
+         user.email = req.body.email;
+         User.findByIdAndUpdate(user._id, user, function(err, user) {
+            if (err) {
+               res.status(400).send(err);
+            }
+         });
+         
+         // update devicedatas in devicedatas db
+         Device.find({userEmail: decodedToken.email}, function(err, device) {
+            device.userEmail = req.body.email;
+            Device.findByIdAndUpdate(device._id, device, function(err, user) {
+               if (err) {
+                  res.status(400).send(err);
+               }
+               else if (user) {
+                  res.sendStatus(204);
+               }
+               else {
+                  res.sendStatus(404);
+               }
+            });
+         });
+      });
+   }
+   catch (ex) {
+      return res.status(401).json({success: false, message: "Invalid authentication token."});
+   }
+});
+
+
+
 router.put("/updatePassword", function(req, res) {
    // Check for authentication token in x-auth header
    if (!req.headers["x-auth"]) {
