@@ -94,9 +94,10 @@ function updatePassword() {
     data: JSON.stringify({"password": password}),
     contentType: "application/json"
   }).done(function(data) {
-    console.log("updated password!");
+    window.localStorage.removeItem('authToken');
+    window.location = "index.html";
   }).fail(function(jqXHR) {
-    $("#error").html("The user coudl not be updated.");
+    $("#error").html("The user could not be updated.");
   });
 }
 
