@@ -146,8 +146,9 @@ router.put("/updateEmail", function(req, res) {
       });
 
       User.findOne({email: decodedToken.email}, function(err, user) {
+         newEmail = req.body.email;
          // update user email in the users db
-         user.email = req.body.email;
+         user.email = newEmail;
          User.findByIdAndUpdate(user._id, user, function(err, user) {
             if (err) {
                res.status(400).send(err);
@@ -156,7 +157,7 @@ router.put("/updateEmail", function(req, res) {
          
          // update devicedatas in devicedatas db
          Device.find({userEmail: decodedToken.email}, function(err, device) {
-            device.userEmail = req.body.email;
+            device.userEmail = newEmail;
             Device.findByIdAndUpdate(device._id, device, function(err, user) {
                if (err) {
                   res.status(400).send(err);
