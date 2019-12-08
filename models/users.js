@@ -6,7 +6,6 @@ var userSchema = new db.Schema({
   passwordHash: String,
   lastAccess:   { type: Date, default: Date.now },
   userDevices:  [ String ],
-  potholesHit:  [ { potholeId: Number, numHits: Number } ]
 });
 
 var User = db.model("User", userSchema);
