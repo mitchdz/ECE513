@@ -11,7 +11,6 @@ var labRouter = require('./routes/lab');
 
 var usersRouter = require('./routes/users');
 var devicesRouter = require('./routes/devices');
-var potholesRouter = require('./routes/potholes');
 
 var app = express();
 
@@ -48,7 +47,6 @@ app.use('/currency', currencyRouter);
 app.use('/lab', labRouter);
 
 app.use('/devices', devicesRouter);
-app.use('/potholes', potholesRouter);
 
 indexRouter.get('/', function(req, res) {
   res.sendFile(__dirname + '/public/sunrunr/index.html');
