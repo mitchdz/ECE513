@@ -6,6 +6,7 @@ var userSchema = new db.Schema({
   passwordHash: String,
   lastAccess:   { type: Date, default: Date.now },
   userDevices:  [ String ],
+  uvThreshold: Number
 });
 
 var User = db.model("User", userSchema);

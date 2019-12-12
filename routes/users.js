@@ -46,7 +46,8 @@ router.post('/register', function(req, res, next) {
         var newUser = new User ({
             email: req.body.email,
             fullName: req.body.fullName,
-            passwordHash: hash
+            passwordHash: hash,
+            uvThreshold: 3
         });
 
         newUser.save(function(err, user) {
@@ -94,6 +95,37 @@ router.post('/registerToken', function(req, res, next) {
    }
 });
 
+router.put("/updateUv", function(req, res) {
+   // Check for authentication token in x-auth header
+   if (!req.headers["x-auth"]) {
+      return res.status(401).json({success: false, message: "No authentication token"});
+   }
+   
+   var authToken = req.headers["x-auth"];
+   
+   try {
+      var decodedToken = jwt.decode(authToken, secret);
+      
+      User.findOne({email: decodedToken.email}, function(err, user) {
+         user.uvThreshold = req.body.uvThreshold;
+         User.findByIdAndUpdate(user._id, user, function(err, user) {
+            if (err) {
+               res.status(400).send(err);
+            }
+            else if (user) {
+               res.sendStatus(204);
+            }
+            else {
+               res.sendStatus(404);
+            }
+         });
+      });
+   }
+   catch (ex) {
+      return res.status(401).json({success: false, message: "Invalid authentication token."});
+   }
+});
+
 
 router.put("/updateName", function(req, res) {
    // Check for authentication token in x-auth header
@@ -126,55 +158,65 @@ router.put("/updateName", function(req, res) {
    }
 });
 
-
+// updates email in the user collection, and all devices in the devices collection.
 router.put("/updateEmail", function(req, res) {
-   // Check for authentication token in x-auth header
-   if (!req.headers["x-auth"]) {
-      return res.status(401).json({success: false, message: "No authentication token"});
-   }
-   
-   var authToken = req.headers["x-auth"];
-   
-   try {
-      var decodedToken = jwt.decode(authToken, secret);
-      
+  // Check for authentication token in x-auth header
+  if (!req.headers["x-auth"]) {
+    return res.status(401).json({success: false, message: "No authentication token"});
+  }
 
-      User.findOne({email: req.body.email}, function(err, user) {
-         if (user) {
-            return res.status(400).json({success: false, message: "user already exists."});
-         }
-      });
+  if ( !req.body.hasOwnProperty("email")) {
+   responseJson.message = "email not sent in body";
+   return res.status(400).json(responseJson);
+  }
 
-      User.findOne({email: decodedToken.email}, function(err, user) {
-         newEmail = req.body.email;
-         // update user email in the users db
-         user.email = newEmail;
-         User.findByIdAndUpdate(user._id, user, function(err, user) {
-            if (err) {
-               res.status(400).send(err);
-            }
-         });
-         
-         // update devicedatas in devicedatas db
-         Device.find({userEmail: decodedToken.email}, function(err, device) {
-            device.userEmail = newEmail;
-            Device.findByIdAndUpdate(device._id, device, function(err, user) {
-               if (err) {
-                  res.status(400).send(err);
-               }
-               else if (user) {
-                  res.sendStatus(204);
-               }
-               else {
-                  res.sendStatus(404);
-               }
-            });
-         });
-      });
-   }
-   catch (ex) {
-      return res.status(401).json({success: false, message: "Invalid authentication token."});
-   }
+  var authToken = req.headers["x-auth"];
+
+  try {
+    var decodedToken = jwt.decode(authToken, secret);
+    var originalUser = decodedToken.email;
+
+
+    // check if the user already exists
+    User.findOne({email: req.body.email}, function(err, user) {
+       if (user) {
+          return res.status(400).json({success: false, message: "user already exists."});
+       }
+    });
+
+    User.findOne({email: originalUser}, function(err, user) {
+       newEmail = req.body.email;
+       // update user email in the users db
+       user.email = newEmail;
+       User.findByIdAndUpdate(user._id, user, function(err, user) {
+          if (err) {
+             res.status(400).send(err);
+          }
+       });
+       
+       // // update device in device db
+       // Device.find({userEmail: originalUser}, function(err, device) {
+       //    device.userEmail = newEmail;
+       //    Device.findByIdAndUpdate(device._id, device, function(err, user) {
+       //       if (err) {
+       //          res.status(400).send(err);
+       //       }
+       //       else if (user) {
+       //          res.sendStatus(204);
+       //       }
+       //       else {
+       //          res.sendStatus(404);
+       //       }
+       //    });
+       // });
+
+       // update Device in device db
+
+    });
+  }
+  catch (ex) {
+    return res.status(401).json({success: false, message: "Invalid authentication token."});
+  }
 });
 
 
@@ -277,6 +319,7 @@ router.get("/account" , function(req, res) {
             userStatus['email'] = user.email;
             userStatus['fullName'] = user.fullName;
             userStatus['lastAccess'] = user.lastAccess;
+            userStatus['uvThreshold'] = user.uvThreshold;
             
             // Find devices based on decoded token
 		      Device.find({ userEmail : decodedToken.email}, function(err, devices) {

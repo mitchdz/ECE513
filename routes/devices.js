@@ -8,6 +8,63 @@ let jwt = require("jwt-simple");
 /* Authenticate user */
 var secret = fs.readFileSync(__dirname + '/../../jwtkey').toString();
 
+router.get('/newDevice', function(req, res, next) {
+  // get deviceID from req.body.deviceID
+  let responseJson = {
+    message : "",
+  };
+
+  if ( !req.body.hasOwnProperty("deviceId")) {
+    responseJson.message = "Missing deviceID.";
+    return res.status(400).json(responseJson);
+  }
+
+  let incomingDeviceId = req.body.deviceId;
+  
+  // check if the deviceID is pending assignment
+    // if pending, return generate APIKey
+    // if not, die.
+});
+
+
+router.get('/currentActivityId', function(req, res, next) {
+  // read a file such that it returns the value, and then updates the value in
+  // the file
+
+  let responseJson = {
+    message : "",
+  };
+
+  if ( !req.body.hasOwnProperty("deviceId")) {
+    responseJson.message = "Missing deviceID.";
+    return res.status(400).json(responseJson);
+  }
+
+  let incomingDeviceId = req.body.deviceId;
+
+});
+
+
+router.get('/uvThreshold', function(req,res) {
+  var query = {id:req.query.id};
+  Devices.findOne(query,function(err, device) {
+    if (err) {
+      res.status(400).json({success:false, message:"No device with that id exists"});
+    }
+    var userQuery = {email:device.email};
+    Users.findOne(userQuery, function(err, user) {
+      if (err) {
+        res.status(400).json({success:false, message:"User could not be found."});
+      }
+      else {
+        var response = user.uvThreshold
+        res.status(200).json({message:response});
+      }
+    })
+  })
+});
+
+
 // Function to generate a random apikey consisting of 32 characters
 function getNewApikey() {
   let newApikey = "";

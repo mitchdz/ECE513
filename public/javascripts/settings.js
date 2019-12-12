@@ -10,6 +10,7 @@ function sendReqForAccountInfo() {
 }
 
 function accountInfoSuccess(data, textSatus, jqXHR) {
+  $("#uv").html(data.uvThreshold);
   $("#email").html(data.email);
   $("#fullName").html(data.fullName);
   $("#lastAccess").html(data.lastAccess);
@@ -79,7 +80,27 @@ function hideNameForm() {
   $("#error").hide();
 }
 
+// Show add device form and hide the add device button (really a link)
+function showUvForm() {
+  $("#newUv").val("");        // Clear the input for the device ID 
+  $("#changeUvControl").hide();   // Hide the add device link
+  $("#changeUvForm").slideDown();  // Show the add device form
+}
 
+// Hides the add device form and shows the add device button (link)
+function hideUvForm() {
+  $("#changeUvControl").show();  // Hide the add device link
+  $("#changeUvForm").slideUp();  // Show the add device form
+  $("#error").hide();
+}
+
+
+function hideAllForms() {
+    hideEmailForm();
+    hideChangePasswordForm();
+    hideNameForm();
+    hideUvForm();
+}
 
 function updatePassword() {
   //TODO: validate password
@@ -107,6 +128,28 @@ function updatePassword() {
     $("#error").show();
   }
 }
+
+
+
+
+
+function updateUv() {
+  let inputUvThreshold = $("#newUv").val();
+
+  $.ajax({
+    type: "PUT",
+    url: "/users/updateUv",
+    headers: { 'x-auth': window.localStorage.getItem("authToken") },
+    data: JSON.stringify({"uvThreshold": inputUvThreshold}),
+    contentType: "application/json"
+  }).done(function(data) {
+    location.reload();
+  }).fail(function(jqXHR) {
+    $("#error").html("The user could not be updated.");
+  });
+}
+
+
 
 function updateEmail() {
   let inputEmail = $("#newEmail").val();
@@ -174,6 +217,10 @@ $(function() {
   $("#changeName").click(showNameForm);
   $("#updateName").click(updateName);  
   $("#nameCancel").click(hideNameForm);  
+
+  $("#changeUv").click(showUvForm);
+  $("#updateUv").click(updateUv);  
+  $("#UvCancel").click(hideUvForm);  
 
 
 });

@@ -30,6 +30,7 @@ function accountInfoSuccess(data, textSatus, jqXHR) {
   $("#email").html(data.email);
   $("#fullName").html(data.fullName);
   $("#lastAccess").html(data.lastAccess);
+  $("#uvThreshold").html(data.uvThreshold);
   $("#main").show();
   
   // Add the devices to the list before the list item for the add device button (link)
@@ -177,8 +178,6 @@ function registerDevice() {
   }
 
 }
-
-
 
 
 function replaceDevice(event, deviceId) {

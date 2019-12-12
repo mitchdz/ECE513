@@ -22,7 +22,7 @@
    display: none;
 }
 
-#changePasswordForm, #main, #error , #changeEmailForm, #changeNameForm{
+#changePasswordForm, #main, #error , #changeEmailForm, #changeNameForm, #changeUvForm {
     display: none;
 }
 
