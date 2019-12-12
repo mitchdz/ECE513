@@ -45,6 +45,51 @@ router.get('/currentActivityId', function(req, res, next) {
 });
 
 
+router.post('/delete', function(req, res, next) {
+  if (!req.body.hasOwnProperty("deviceId")) {
+    res.status(400).json({success:false, message:"Missing deviceId"});
+  }
+
+  if (!req.headers["x-auth"]) {
+    res.status(401).json({success:false, message: "Invalid Credentials"});
+  }
+  else {
+    let token = req.headers["x-auth"];
+    try {
+      let decoded = jwt.decode(token, secret);
+      let query = {id:req.body.deviceId};
+      Device.findOne(query, function(err, device) {
+        if (err) {
+          res.status(400).json({success:false, message:"Could not find device"});
+        }
+        else if (device) {
+          if (device.email == decoded.email) {
+            Device.deleteOne({deviceId: req.body.deviceId}, function(err, obj) {
+              if(err){
+                res.status(400).json({success:false, message:"Could not delete the device"}); 
+              }
+              res.status(200).json({success:true, message:"Device Deleted."});
+            });
+          }
+          else{
+            res.status(400).json({success:false, message:"No device registered with that device id."});
+          }
+        }
+        else {
+          res.status(400).json({success:false, message: "no error, but device not returned"});
+        }
+      });
+
+    }
+    catch(ex) {
+      res.stauts(401).json({success:false, message:"error decoding jwt"});
+    }
+  }
+
+});
+
+
+
 router.get('/uvThreshold', function(req,res) {
   var query = {id:req.query.id};
   Devices.findOne(query,function(err, device) {
@@ -288,6 +333,65 @@ router.post('/register', function(req, res, next) {
     }
   });
 });
+
+
+router.post('/replace', function(req, res, next) {
+
+
+    let responseJson = {
+        success: false,
+        message : "",
+    };
+    
+    // Ensure the request includes the deviceId parameter
+    if( !req.body.hasOwnProperty("oldId")) {
+        responseJson.message = "Missing oldId.";
+        return res.status(400).json(responseJson);
+    }
+
+    // Ensure the request includes the deviceId parameter
+    if( !req.body.hasOwnProperty("newId")) {
+        responseJson.message = "Missing newId.";
+        return res.status(400).json(responseJson);
+    }    
+    
+    try {
+      let decoded = jwt.decode(token, secret);
+
+
+
+
+      // let query = {id:req.body.deviceId};
+      // Device.findOne(query, function(err, device) {
+      //   if (err) {
+      //     res.status(400).json({success:false, message:"Could not find device"});
+      //   }
+      //   else if (device) {
+      //     if (device.email == decoded.email) {
+      //       Device.deleteOne({deviceId: req.body.deviceId}, function(err, obj) {
+      //         if(err){
+      //           res.status(400).json({success:false, message:"Could not delete the device"}); 
+      //         }
+      //         res.status(200).json({success:true, message:"Device Deleted."});
+      //       });
+      //     }
+      //     else{
+      //       res.status(400).json({success:false, message:"No device registered with that device id."});
+      //     }
+      //   }
+      //   else {
+      //     res.status(400).json({success:false, message: "no error, but device not returned"});
+      //   }
+      // });
+    }
+    catch(ex) {
+      res.status(401).json({success:false, message:"error decoding jwt"});
+    }
+
+
+});
+
+
 
 router.post('/ping', function(req, res, next) {
     let responseJson = {

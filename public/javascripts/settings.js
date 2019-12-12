@@ -15,6 +15,8 @@ function accountInfoSuccess(data, textSatus, jqXHR) {
   $("#fullName").html(data.fullName);
   $("#lastAccess").html(data.lastAccess);
   $("#main").show();
+
+
 }
 
 function accountInfoError(jqXHR, textStatus, errorThrown) {

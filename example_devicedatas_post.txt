@@ -1,0 +1,3 @@
+{
+   "data": "{ \"deviceId\": \"1\", \"email\": \"test\", \"APIkey\": \"edecZ7R1UrvtblJcqVazUf3e8VgvZpLQ\", \"gps_exists\": \"true\", \"gps_speed\": \"4\", \"gps_lat\": \"5\", \"gps_long\": \"6\", \"uv\": \"7\", \"time\": \"8\" }"
+}
