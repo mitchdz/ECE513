@@ -11,11 +11,44 @@ SunrunnerUV uv;
 
 char dataBuffer[512];
 
-char apiKey[] = "xkph53MtYADVQ98Ry78MEsqXGmH0BYru";
+char apiKey[33];
+
+typedef enum{
+	IDLE = 0,
+	ACTIVE,
+	AWAITING_AUTH
+} Mode;
+
+Mode deviceMode = AWAITING_AUTH;
+
+unsigned long authTimer = 0;
 
 PingPattern pingRGB = PingPattern(LED_PRIORITY_IMPORTANT);
 unsigned long pingTimer = 0;
 boolean activePing = false;
+
+unsigned long activityNumber = 0;
+
+
+boolean timerExceeds(unsigned long timer, unsigned long delay)
+{
+	unsigned long currentTime = millis();
+
+	//Handle overflow
+	if(currentTime < timer)
+	{
+		timer = currentTime;
+		return false;
+	}
+
+	if(currentTime > timer + delay)
+	{
+		timer = currentTime;
+		return true;
+	}
+
+	return false;
+}
 
 int ping(String command)
 {
@@ -80,14 +113,34 @@ int publishData(String command)
 	}
 }
 
+int startActivityInit(const char *event, const char *data)
+{
+	activityNumber = atoi(data);
+	return (activityNumber == 0) ? 1 : 0; //Returns 1 on failure
+}
+
+int authReply(const char *event, const char *data)
+{
+	return 0;
+}
 
 void setup()
 {
 	gps.begin();
 	uv.begin();
 
+	//Test for API key
+	if(EEPROM.read(0) == 1)
+	{
+		deviceMode = IDLE;
+	}
+
 	Particle.function("getdata", publishData);
 	Particle.function("pingDevice", ping);
+
+    pinMode(BTN, INPUT);
+    Particle.subscribe("hook-response/startActivity", startActivityInit, MY_DEVICES);
+	Particle.subscribe("hook-response/requestAuth", authReply, MY_DEVICES);
 
 	delay(1000);
 
@@ -96,17 +149,42 @@ void setup()
 
 void loop()
 {
-	gps.readGPSData();
-	uv.readValues();
-
-	if(activePing)
+	if(deviceMode == AWAITING_AUTH)
 	{
-		if(millis() - pingTimer > 5000)
+		//Request every 10 seconds
+		if(timerExceeds(authTimer, 10000))
 		{
-			activePing = false;
-			pingRGB.setActive(false);
+			Particle.publish("requestAuth", "{ \"deviceID\" = \"" + System.deviceID() + "\"}", PUBLIC);
+		}
+	}
+	else
+	{
+		gps.readGPSData();
+		uv.readValues();
+
+		if(activePing)
+		{
+			if(millis() - pingTimer > 5000)
+			{
+				activePing = false;
+				pingRGB.setActive(false);
+			}
+		}
+
+		if (digitalRead(BTN) == 0)
+		{
+			if(deviceMode == IDLE)
+			{
+				Particle.publish("startActivity", "", PUBLIC);
+				deviceMode = ACTIVE;
+			}
+			else if(deviceMode == ACTIVE)
+			{
+				Particle.publish("stopActivity", "", PUBLIC);
+				deviceMode = IDLE;
+			}
 		}
 	}
 
-	delay(500);
+	delay(50);
 }
