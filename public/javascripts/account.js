@@ -39,7 +39,6 @@ function accountInfoSuccess(data, textSatus, jqXHR) {
       device.deviceId + ", APIKEY: " + device.apikey + "<br>" +
       " <button id='ping-" + device.deviceId + "' class='waves-effect waves-light btn'>Ping</button> " +
       " <button id='activity-" + device.deviceId + "' class='waves-effect waves-light btn'>Activity</button> " +
-      " <button id='replace-" + device.deviceId + "' class='waves-effect waves-light btn'>Replace</button> " +
 
       " <li class='collection-item' id='activityForm-" + device.deviceId + "'>" +
       " <div id=map-" + device.deviceId + " class=map style=\"height: 30vh; max-width:40vw;\">" + device.deviceId + "</div>" +
@@ -47,24 +46,12 @@ function accountInfoSuccess(data, textSatus, jqXHR) {
       " <button id='refresh-" + device.deviceId + "' class='waves-effect waves-light btn'>Refresh</button> " +
       " <button id='close-" + device.deviceId + "' class='waves-effect waves-light btn'>Close</button> " +
       " </li>" +
-
-      " <li class='collection-item' id='replaceForm-" + device.deviceId + "'>" +
-      " <label for='replaceDevice-" + device.deviceId + "'>New Device ID (alphanumeric characters only):</label>" +
-      " <input type='text' id='replaceDevice-" + device.deviceId + "' name='replaceDevice-" + device.deviceId + "' col='30'>" +
-      " <button id='SubmitReplace-" + device.deviceId + "' class='waves-effect waves-light btn'>Submit</button> " +
-      " <button id='closeReplace-" + device.deviceId + "' class='waves-effect waves-light btn'>Close</button> " +
-      " </li>" +
-
       " </li>");
     //var map = new google.maps.Map(document.getElementById('#map-' + device.deviceId), {zoom: 7, center: {lat:32.221667, lng:-110.926389}});
     $("#activityForm-"+device.deviceId).slideUp();
-    $("#replaceForm-"+device.deviceId).slideUp();
     $("#ping-"+device.deviceId).click(function(event) {
       pingDevice(event, device.deviceId);
     });
-    $("#replace-"+device.deviceId).click(function(event) {
-      replaceDevice(event, device.deviceId);
-    });    
     $("#activity-"+device.deviceId).click(function(event) {
       activityDevice(event, device.deviceId);
     });
@@ -171,31 +158,6 @@ function registerDevice() {
          $("#error").show();    
   }
 
-}
-
-
-function replaceDevice(event, deviceId) {
-  $("#activityForm-"+device.deviceId).slideUp();
-  $("#replaceForm-"+deviceId).slideDown();
-
-
-   // $.ajax({
-   //      url: '/devices/replace',
-   //      type: 'POST',
-   //      headers: { 'x-auth': window.localStorage.getItem("authToken") },   
-   //      data: { 'deviceId': deviceId }, 
-   //      responseType: 'json',
-   //      success: function (data, textStatus, jqXHR) {
-   //          console.log("Pinged.");
-   //      },
-   //      error: function(jqXHR, textStatus, errorThrown) {
-   //          var response = JSON.parse(jqXHR.responseText);
-   //          $("#error").html("Error: " + response.message);
-   //          $("#error").show();
-   //      }
-   //  }); 
-
-  // console.log("IMPLEMENT REPLACE");
 }
 
 function pingDevice(event, deviceId) {

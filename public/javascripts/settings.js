@@ -16,8 +16,67 @@ function accountInfoSuccess(data, textSatus, jqXHR) {
   $("#lastAccess").html(data.lastAccess);
   $("#main").show();
 
+  // Add the devices to the list before the list item for the add device button (link)
+  for (let device of data.devices) {
+    $("#addDeviceForm").before("<li class='collection-item'>ID: " +
+      device.deviceId + ", APIKEY: " + device.apikey + "<br>" +
+      " <button id='replace-" + device.deviceId + "' class='waves-effect waves-light btn'>Replace</button> " +
 
+      " <li class='collection-item' id='replaceForm-" + device.deviceId + "'>" +
+      " <label for='newId-" + device.deviceId + "'>New Device ID (alphanumeric characters only):</label>" +
+      " <input type='text' id='newId-" + device.deviceId + "' name='newId-" + device.deviceId + "' col='30'>" +
+      " <button id='SubmitReplace-" + device.deviceId + "' class='waves-effect waves-light btn'>Submit</button> " +
+      " <button id='closeReplace-" + device.deviceId + "' class='waves-effect waves-light btn'>Close</button> " +
+      " </li>" +
+
+      " </li>");
+    // $("#replaceForm-"+device.deviceId).slideUp();
+    $("#replaceForm-"+device.deviceId).click(function(event) {
+      replaceDevice(event, device.deviceId);
+    });
+    $("#closeReplace-"+device.deviceId).click(function(event) {
+      closeReplace(event, device.deviceId);
+    });
+    $("#SubmitReplace-"+device.deviceId).click(function(event) {
+      SubmitReplace(event, device.deviceId);
+    });
+  }
 }
+
+function SubmitReplace(event, deviceId) {
+  console.log("IMPLEMENT");
+}
+
+
+function closeReplace(event, deviceId) {
+  $("#replaceForm-"+deviceId).slideUp();
+}
+
+
+function replaceDevice(event, deviceId) {
+  console.log("hit");
+  $("#replaceForm-"+deviceId).slideDown();
+
+   // $.ajax({
+   //      url: '/devices/replace',
+   //      type: 'POST',
+   //      headers: { 'x-auth': window.localStorage.getItem("authToken") },   
+   //      data: { 'deviceId': deviceId }, 
+   //      responseType: 'json',
+   //      success: function (data, textStatus, jqXHR) {
+   //          console.log("Pinged.");
+   //      },
+   //      error: function(jqXHR, textStatus, errorThrown) {
+   //          var response = JSON.parse(jqXHR.responseText);
+   //          $("#error").html("Error: " + response.message);
+   //          $("#error").show();
+   //      }
+   //  }); 
+
+  // console.log("IMPLEMENT REPLACE");
+}
+
+
 
 function accountInfoError(jqXHR, textStatus, errorThrown) {
   // If authentication error, delete the authToken 
@@ -119,7 +178,7 @@ function updatePassword() {
       contentType: "application/json"
     }).done(function(data) {
       window.localStorage.removeItem('authToken');
-      window.location = "index.html";
+      window.location.replace("index.html");
     }).fail(function(jqXHR) {
       $("#error").html("The user could not be updated.");
       $("#error").show();
