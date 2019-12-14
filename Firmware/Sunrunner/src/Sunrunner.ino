@@ -119,8 +119,15 @@ int startActivityInit(const char *event, const char *data)
 	return (activityNumber == 0) ? 1 : 0; //Returns 1 on failure
 }
 
+//Get new API key and replace EEPROM value of the key 
 int authReply(const char *event, const char *data)
 {
+	strncpy(apiKey, data, 32);
+	EEPROM.write(0, 1);
+
+	for(int i = 1; i < 33; i++)
+		EEPROM.write(i, (uint8_t) apiKey[i-1]);
+
 	return 0;
 }
 
@@ -133,6 +140,11 @@ void setup()
 	if(EEPROM.read(0) == 1)
 	{
 		deviceMode = IDLE;
+
+		for(int i = 1; i < 33; i++)
+			apiKey[i-1] = (char) EEPROM.read(i);
+
+		apiKey[32] = '\0';
 	}
 
 	Particle.function("getdata", publishData);
