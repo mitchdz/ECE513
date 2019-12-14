@@ -5,6 +5,12 @@ let DeviceData = require("../models/deviceData");
 let fs = require('fs');
 let jwt = require("jwt-simple");
 
+
+const request = require('request');
+global.tempGlobal;
+global.humidityGlobal;
+
+
 /* Authenticate user */
 var secret = fs.readFileSync(__dirname + '/../../jwtkey').toString();
 
@@ -27,22 +33,7 @@ router.get('/newDevice', function(req, res, next) {
 });
 
 
-router.get('/currentActivityId', function(req, res, next) {
-  // read a file such that it returns the value, and then updates the value in
-  // the file
 
-  let responseJson = {
-    message : "",
-  };
-
-  if ( !req.body.hasOwnProperty("deviceId")) {
-    responseJson.message = "Missing deviceID.";
-    return res.status(400).json(responseJson);
-  }
-
-  let incomingDeviceId = req.body.deviceId;
-
-});
 
 
 router.post('/delete', function(req, res, next) {
@@ -85,8 +76,96 @@ router.post('/delete', function(req, res, next) {
       res.stauts(401).json({success:false, message:"error decoding jwt"});
     }
   }
+});
+
+
+
+
+router.post('/addActivity', function(req, res) {
+  var tempLong = req.body.gps_long.trim().split(" ");
+  for (var i=0; i<tempLon.length; i++){
+    tempLong[i] = Number(tempLong[i]);
+  }
+  var tempLat = req.body.gps_lat.trim().split(" ");
+  for (var i=0; i<tempLat.length; i++){
+    tempLat[i] = Number(tempLat[i]);
+  }
+
+  let long = tempLong[0];
+  let lat = tempLat[0];
+  let temp;
+  let humidity;
+
+
+  //get data from weather API
+  request('http://api.openweathermap.org/data/2.5/weather?appid=6e5be09cc06697c608c9d8a12dda7698&lat='+lat+'&lon='+lon, {json:true},(err, res, body) =>{
+    if(err){
+      console.log("failed request");
+    }
+    else{
+      global.tempGlobal = ((Number(body.main.temp)-273.15)*9/5+32).toFixed(2);
+      global.humidityGlobal = Number(body.main.humidity);
+    }
+  });
+
+  var time = new Date();
+  var timeNow = time.getTime();
+
+  var tempSpeed = req.body.gps_speed.trim().split(" ");
+  var sumSpeed = 0;
+  for(var i=0; i<tempSpeed.length; i++){
+    tempSpeed[i] = Number(tempSpeed[i]);
+    sumSpeed += tempSpeed[i];
+  }
+
+  var tempUV = req.body.uv.trim().split(" ");
+  for(var i=0; i<tempUV.length; i++){
+    tempUV[i] = Number(tempUV[i]);
+  }
+
+  var duration = ((15*tempSpeed.length)/60).toFixed(2);
+  var averageSpeed = (sumSpeed/tempSpeed.length).toFixed(2);
+
+  if(averageSpeed < 4){
+    var activity = "Walk";
+    var calories = (7.6*duration).toFixed(2);
+  }
+  else if (averageSpeed < 8){
+    var activity = "Run";
+    var calories = (13.2*duration).toFixed(2);
+  }
+  else{
+    var activity = "Bike";
+    var calories = (10*duration).toFixed(2);
+  }
+
+  let newActivity = new DeviceData({
+    deviceId:req.body.deviceId,
+    gps_long:tempLon,
+    gps_lat:tempLat,
+    gps_speed:tempSpeed,
+    uv:tempUV,
+    date:req.body.time,
+    timeAdded:timeNow,
+    duration:duration,
+    type:activity,
+    calories:calories,
+    temp:global.tempGlobal,
+    humidity:global.humidityGlobal
+
+  });
+
+  newActivity.save(function(err, newActivity){
+    if(err){
+      res.status(400).json({success:"false", message:"activity was not saved properly.", err:err});
+    }
+    else{
+      res.status(400).json({success:"true", message:"activity was saved properly."});
+    }
+  })
 
 });
+
 
 
 
@@ -177,89 +256,6 @@ router.get('/status/:devid', function(req, res, next) {
     res.status(200).json(responseJson);
   });
 });
-
-router.post('/deviceData', function(req, res, next) {
-    let responseJson = {
-        removed: false,
-        deviceId : "none",
-        message : "",
-    };
-
-    let incoming = JSON.parse(req.body.data);
-
-    if ( !incoming.hasOwnProperty("gps_exists")) {
-        responseJson.message = "Missing gps_exists.";
-        return res.status(400).json(responseJson);
-    }
-
-    if ( !incoming.hasOwnProperty("gps_speed")) {
-      responseJson.message = "Missing gps_speed.";
-      return res.status(400).json(responseJson);
-    }
-
-    if ( !incoming.hasOwnProperty("gps_lat")) {
-        responseJson.message = "Missing gps_lat.";
-        return res.status(400).json(responseJson);
-    }
-    if ( !incoming.hasOwnProperty("gps_long")) {
-        responseJson.message = "Missing gps_long.";
-        return res.status(400).json(responseJson);
-    }
-
-    if ( !incoming.hasOwnProperty("uv")) {
-        responseJson.message = "Missing uv.";
-        return res.status(400).json(responseJson);
-    }
-
-    if ( !incoming.hasOwnProperty("time")) {
-        responseJson.message = "Missing time.";
-        return res.status(400).json(responseJson);
-    }
-
-    if ( !incoming.hasOwnProperty("deviceId")) {
-        responseJson.message = "Missing deviceId.";
-        return res.status(400).json(responseJson);
-    }
-
-    if ( !incoming.hasOwnProperty("APIkey")) {
-        responseJson.message = "Missing APIkey.";
-        return res.status(400).json(responseJson);
-    }
-
-    if (incoming.gps_exists) {
-        let gps_lat = incoming.gps_location;
-        let gps_long = incoming.gps_long;
-    }
-
-    // Create a new device with specified id, user email, and randomly generated apikey.
-    let newDeviceData = new DeviceData({
-        gps_exists: incoming.gps_exists,
-        gps_speed: incoming.gps_speed,
-        gps_lat: incoming.gps_lat,
-        gps_long: incoming.gps_long,
-        uv: incoming.uv,
-        time: incoming.time,
-        deviceId: incoming.deviceId,
-        APIkey: incoming.APIkey
-    });
-
-    // Save device. If successful, return success. If not, return error message.
-    newDeviceData.save(function(err, newDevice) {
-    if (err) {
-      responseJson.message = err;
-      // This following is equivalent to: res.status(400).send(JSON.stringify(responseJson));
-      return res.status(400).json(responseJson);
-    }
-    else {
-      responseJson.removed = true;
-      responseJson.deviceId = req.body.deviceId;
-      responseJson.message = "Device ID " + req.body.deviceId + " data was saved.";
-      return res.status(201).json(responseJson);
-    }
-    });
-
-});
-
 
 router.post('/register', function(req, res, next) {
   let responseJson = {

@@ -6,7 +6,7 @@ var deviceDataSchema = new db.Schema({
     gps_long:   [Number],
     uv:         [Number],
     time:       { type: Date, required: true },
-    unixTime: Number,
+    timeAdded: Number,
     deviceId:   { type: String, required: true },
     APIkey:     { type: String, required: true },
     temperature: Number,
