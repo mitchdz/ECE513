@@ -30,51 +30,56 @@ function accountInfoSuccess(data, textSatus, jqXHR) {
       " </li>" +
 
       " </li>");
-    // $("#replaceForm-"+device.deviceId).slideUp();
-    $("#replaceForm-"+device.deviceId).click(function(event) {
-      replaceDevice(event, device.deviceId);
+    $("#replaceForm-"+device.deviceId).slideUp();
+    $("#replace-"+device.deviceId).click(function(event) {
+      openReplace(event, device.deviceId);
     });
     $("#closeReplace-"+device.deviceId).click(function(event) {
       closeReplace(event, device.deviceId);
     });
     $("#SubmitReplace-"+device.deviceId).click(function(event) {
       SubmitReplace(event, device.deviceId);
-    });
+    }); 
+
+
   }
 }
 
 function SubmitReplace(event, deviceId) {
-  console.log("IMPLEMENT");
+  let newId = $('#newId-'+deviceId).val();
+  let oldId = deviceId;
+
+  let password = $("#newPassword").val();
+  let passwordConfirm = $('#confirmPassword').val();
+
+  $.ajax({
+    type: "PUT",
+    url: "/devices/replace",
+    headers: { 'x-auth': window.localStorage.getItem("authToken") },
+    data: JSON.stringify({"oldId": oldId, "newId": newId}),
+    contentType: "application/json"
+  }).done(function(data) {
+    console.log("done");
+    window.location.replace("settings.html");
+  }).fail(function(jqXHR) {
+    console.log(jqXHR);
+    $("#error").html("The device could not be replaced.");
+    $("#error").show();
+  });
+
 }
 
 
 function closeReplace(event, deviceId) {
+  console.log("close");
   $("#replaceForm-"+deviceId).slideUp();
 }
 
-
-function replaceDevice(event, deviceId) {
-  console.log("hit");
+function openReplace(event, deviceId) {
+  console.log("open");
   $("#replaceForm-"+deviceId).slideDown();
-
-   // $.ajax({
-   //      url: '/devices/replace',
-   //      type: 'POST',
-   //      headers: { 'x-auth': window.localStorage.getItem("authToken") },   
-   //      data: { 'deviceId': deviceId }, 
-   //      responseType: 'json',
-   //      success: function (data, textStatus, jqXHR) {
-   //          console.log("Pinged.");
-   //      },
-   //      error: function(jqXHR, textStatus, errorThrown) {
-   //          var response = JSON.parse(jqXHR.responseText);
-   //          $("#error").html("Error: " + response.message);
-   //          $("#error").show();
-   //      }
-   //  }); 
-
-  // console.log("IMPLEMENT REPLACE");
 }
+
 
 
 

@@ -190,27 +190,27 @@ router.put("/updateEmail", function(req, res) {
        user.email = newEmail;
        User.findByIdAndUpdate(user._id, user, function(err, user) {
           if (err) {
-             res.status(400).send(err);
+             return res.status(400).json(err);
           }
        });
        
-       // // update device in device db
-       // Device.find({userEmail: originalUser}, function(err, device) {
-       //    device.userEmail = newEmail;
-       //    Device.findByIdAndUpdate(device._id, device, function(err, user) {
-       //       if (err) {
-       //          res.status(400).send(err);
-       //       }
-       //       else if (user) {
-       //          res.sendStatus(204);
-       //       }
-       //       else {
-       //          res.sendStatus(404);
-       //       }
-       //    });
-       // });
+       // update device in device db
+       Device.find({userEmail: originalUser}, function(err, devices) {
+        if (err) {
+          res.status(400).json({success:"false", message:"could not locate devices", err:err});
+        }
+        for (var device in devices) {
+          return res.status(400).json(device);
+          device.userEmail = newEmail;
+          Device.findByIdAndUpdate(device._id, device, function(err, device) {
+            if (err) {
+              res.status(400).json({success:"false", message:"error updating device", err:err});
+            }
+          })
+          return res.status(200).json({success:"true", message:"updated all devices properly."});
+        }
+       })
 
-       // update Device in device db
 
     });
   }
