@@ -82,7 +82,13 @@ router.post('/delete', function(req, res, next) {
 
 
 router.post('/addActivity', function(req, res) {
-  req.body = JSON.parse(req.body.data);
+  req.body = JSON.parse(req.body.data); // data is stored in a weird fashion
+
+  // make sure APIkey is what it should be
+
+
+
+
   var tempLong = req.body.gps_long.trim().split(" ");
   for (var i=0; i<tempLong.length; i++){
     tempLong[i] = Number(tempLong[i]);
@@ -101,16 +107,13 @@ router.post('/addActivity', function(req, res) {
   //get data from weather API
   request('http://api.openweathermap.org/data/2.5/weather?appid=6e5be09cc06697c608c9d8a12dda7698&lat='+lat+'&lon='+long, {json:true},(err, res, body) =>{
     if(err){
-      console.log("failed request");
+      console.log(err);
     }
     else{
       global.tempGlobal = ((Number(body.main.temp)-273.15)*9/5+32).toFixed(2);
       global.humidityGlobal = Number(body.main.humidity);
     }
   });
-
-  var time = new Date();
-  var timeNow = time.getTime();
 
   var tempSpeed = req.body.gps_speed.trim().split(" ");
   var sumSpeed = 0;
@@ -129,11 +132,11 @@ router.post('/addActivity', function(req, res) {
 
   if(averageSpeed < 4){
     var activity = "Walk";
-    var calories = (7.6*duration).toFixed(2);
+    var calories = (7*duration).toFixed(2);
   }
   else if (averageSpeed < 8){
     var activity = "Run";
-    var calories = (13.2*duration).toFixed(2);
+    var calories = (13*duration).toFixed(2);
   }
   else{
     var activity = "Bike";
@@ -146,12 +149,11 @@ router.post('/addActivity', function(req, res) {
     gps_lat:tempLat,
     gps_speed:tempSpeed,
     uv:tempUV,
-    date:req.body.time,
-    timeAdded:timeNow,
+    timeStarted:req.body.time,
     duration:duration,
     type:activity,
     calories:calories,
-    temp:global.tempGlobal,
+    temperature:global.tempGlobal,
     humidity:global.humidityGlobal
 
   });
@@ -161,7 +163,7 @@ router.post('/addActivity', function(req, res) {
       res.status(400).json({success:"false", message:"activity was not saved properly.", err:err});
     }
     else{
-      res.status(400).json({success:"true", message:"activity was saved properly."});
+      res.status(200).json({success:"true", message:"activity was saved properly."});
     }
   })
 
