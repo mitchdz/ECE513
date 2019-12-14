@@ -82,8 +82,9 @@ router.post('/delete', function(req, res, next) {
 
 
 router.post('/addActivity', function(req, res) {
+  req.body = JSON.parse(req.body.data);
   var tempLong = req.body.gps_long.trim().split(" ");
-  for (var i=0; i<tempLon.length; i++){
+  for (var i=0; i<tempLong.length; i++){
     tempLong[i] = Number(tempLong[i]);
   }
   var tempLat = req.body.gps_lat.trim().split(" ");
@@ -98,7 +99,7 @@ router.post('/addActivity', function(req, res) {
 
 
   //get data from weather API
-  request('http://api.openweathermap.org/data/2.5/weather?appid=6e5be09cc06697c608c9d8a12dda7698&lat='+lat+'&lon='+lon, {json:true},(err, res, body) =>{
+  request('http://api.openweathermap.org/data/2.5/weather?appid=6e5be09cc06697c608c9d8a12dda7698&lat='+lat+'&lon='+long, {json:true},(err, res, body) =>{
     if(err){
       console.log("failed request");
     }
@@ -141,7 +142,7 @@ router.post('/addActivity', function(req, res) {
 
   let newActivity = new DeviceData({
     deviceId:req.body.deviceId,
-    gps_long:tempLon,
+    gps_long:tempLong,
     gps_lat:tempLat,
     gps_speed:tempSpeed,
     uv:tempUV,
