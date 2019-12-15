@@ -9,230 +9,26 @@ function sendReqForAccountInfo() {
     .fail(accountInfoError);
 }
 
-function initMap()
-{
-	$('.map').each(function (index, Element) {
-		devid = Element.innerHTML
-
-		map = new google.maps.Map(Element, 
-		{
-			center: {lat:32.221667, lng:-110.926389},
-			zoom: 12
-		});
-
-		maps[devid] = map;
-	});
-}
-
-// function accountInfoSuccess(data, textSatus, jqXHR) {
-//   $("#email").html(data.email);
-//   $("#fullName").html(data.fullName);
-//   $("#lastAccess").html(data.lastAccess);
-//   $("#uvThreshold").html(data.uvThreshold);
-//   $("#main").show();
-  
-//   // Add the devices to the list before the list item for the add device button (link)
-//   for (let device of data.devices) {
-//     $("#addDeviceForm").before("<li class='collection-item'>ID: " +
-//       device.deviceId + ", APIKEY: " + device.apikey + "<br>" +
-//       " <button id='ping-" + device.deviceId + "' class='waves-effect waves-light btn'>Ping</button> " +
-//       " <button id='activity-" + device.deviceId + "' class='waves-effect waves-light btn'>Activity</button> " +
-
-//       " <li class='collection-item' id='activityForm-" + device.deviceId + "'>" +
-//       " <div id=map-" + device.deviceId + " class=map style=\"height: 30vh; max-width:40vw;\">" + device.deviceId + "</div>" +
-//       " <p id=data-" + device.deviceId + "></p>" +
-//       " <button id='refresh-" + device.deviceId + "' class='waves-effect waves-light btn'>Refresh</button> " +
-//       " <button id='close-" + device.deviceId + "' class='waves-effect waves-light btn'>Close</button> " +
-//       " </li>" +
-//       " </li>");
-//     //var map = new google.maps.Map(document.getElementById('#map-' + device.deviceId), {zoom: 7, center: {lat:32.221667, lng:-110.926389}});
-//     $("#activityForm-"+device.deviceId).slideUp();
-//     $("#activity-"+device.deviceId).click(function(event) {
-//       activityDevice(event, device.deviceId);
-//     });
-//     $("#close-"+device.deviceId).click(function(event) {
-//       closeActivity(event, device.deviceId);
-//     });
-//     $("#refresh-"+device.deviceId).click(function(event) {
-//       refreshActivity(event, device.deviceId);
-//     });
-//   }
-
-//   initMap();
-// }
-
-
 function accountInfoSuccess(data, textSatus, jqXHR) {
   $("#email").html(data.email);
   $("#fullName").html(data.fullName);
   $("#main").show();
 
-  $("#totalDuration").html(0);
-  $("#totalCalories").html(0);
-  $("#totalUv").html(0);
-
-  updateTotalView(data.devices);
-
-  // Add the devices to the list before the list item for the add device button (link)
-  for (let device of data.devices) {
-    // $("#addDeviceForm").before("<li class='collection-item'>ID: " +
-    //   "<span class='ID'> " + device.deviceId + "</span>, APIKEY: <span class='ID'> " + device.apikey + "</span><br>" +
-
-
-    //   " </li>");
-
-
-    $("#addDeviceForm").before("<li class='collection-item'>ID: " +
-      device.deviceId + ", APIKEY: " + device.apikey + "<br>" +
-      " <button id='summary-" + device.deviceId + "' class='waves-effect waves-light btn'>Summary</button> " +
-
-      " <li class='collection-item' id='summaryForm-" + device.deviceId + "'>" +
-      " <button id='closeSummary-" + device.deviceId + "' class='waves-effect waves-light btn'>Close</button> " +
-      " </li>" +
-      " </li>");
-    //var map = new google.maps.Map(document.getElementById('#map-' + device.deviceId), {zoom: 7, center: {lat:32.221667, lng:-110.926389}});
-    $("#summaryForm-"+device.deviceId).slideUp();
-    $("#summary-"+device.deviceId).click(function(event) {
-      showActivities(device.deviceId);
-    });
-    $("#closeSummary-"+device.deviceId).click(function(event) {
-      closeActivity(event, device.deviceId);
-    });
+  // populate the 5 day weather forecast
+  for (var i = 1; i < 6; i++) {
+    $("#endingDiv").before(
+      "<ul id = 'day" + i + "' class='collection with-header'>" +
+      "  <li class='collection-header'>" +
+      "    <h5><span id = 'head" + i + "'></span></h5>" +
+      "  </li>" +
+      "  <li class='collection-item'>Temperature: <span id='t" + i + "'></span></li>" +
+      "  <li class='collection-item'>Humidity: <span id='h" + i + "'></span></li>" +
+      "  <li class = 'collection-item'>UV Index: <span id = 'u" + i + "'></span></li>" +
+      "</ul>"
+      );
   }
-
-  initMap();
+  hideForecast();
 }
-
-function updateTotalView(devices) {
-  for (device of devices) {
-      $.ajax({
-        url: '/devices/activities', 
-        type: 'GET', 
-        headers: { 'device': device.deviceId }, 
-        dataType: 'json', 
-      })
-      .done(function(data, textStatus, jqXHR) {
-        for (activity of data.activities) {
-
-          let time = new Date();
-          let currentTime = time.getTime();
-
-          if ((currentTime - activity.timeAdded) < 604800000) {
-            let calories = Number($("#totalCalories").html()) + activity.calories; 
-            $("#totalCalories").html(calories); 
-            let duration = Number($("#totalDuration").html()) + activity.duration; 
-            $("#totalDuration").html(duration); 
-
-            let tempSum = 0;
-            for (tempUv of activity.uv) {
-              tempSum += tempUv;
-            }
-
-            let uv = Number($("#totalUv").html()) + tempSum; 
-            $("#totalUv").html(uv); 
-          }
-        }
-      })
-      .fail(function(data, textStatus, jqXHR) {
-        console.log(jqXHR);
-      });
-  }
-}
-
-function showActivities(deviceId) {
-  $.ajax({
-    url: '/devices/allActivities', 
-    type: 'GET', 
-    headers: { 'deviceId': deviceId }, 
-    dataType: 'json', 
-  })
-  .done(function(data, textStatus, jqXHR){
-    for (var activity of data.activities) {
-      if(typeof(activity.temp)!=="undefined"){ 
-        var time = new Date(); 
-        var timeNow = time.getTime(); 
-        if((timeNow - activity.unix) < 604800000){
-          var uvSum = 0; 
-          for (var i = 0; i<activity.uv.length; i++){
-            uvSum += activity.uv[i]; 
-          }
-          var duration = Number($("#duration").html()) + activity.duration; 
-          $("#duration").html(duration);
-          var calories = Number($("#calories").html()) + activity.calories; 
-          $("#calories").html(calories); 
-          var uv = Number($("#uvExposure").html()) + uvSum; 
-          $("#uvExposure").html(uv); 
-        }
-      }
-    }
-  })
-  .fail(function(jqXHR, textStatus, errorThrown){
-    let response = JSON.parse(jqXHR.responseText);
-    let error = $("<li class = 'collection-item'></li>");
-    error.html(response.message); 
-    $("#deviceErrorsList").append(error); 
-    $("#deviceErrors").show(); 
-  })  
-
-
-
-}
-
-
-
-
-function refreshActivity(event, deviceId) {
-  $.ajax({
-    url: '/devices/getData',
-    type: 'GET',
-    headers: " 'x-auth'=" +  window.localStorage.getItem("authToken"),  
-    dataType: 'json'
-   })
-     .done(function (data, textStatus, jqXHR) {
-      //  console.log(data);
-       for(let datapoint of data.data) {
-        // console.log(datapoint);
-
-        let devicesList = { data: [] };
-        if (datapoint.deviceId == deviceId) {
-			let latitude = datapoint.gps_lat;
-			let longitude = datapoint.gps_long;
-
-			$('#data-'+deviceId).text("longitude: " + longitude +
-                                    " latitude: " + latitude +
-                                    " gps_speed: " + datapoint.gps_speed +
-                                    " uv: " + datapoint.uv);
-
-			let newPosition = {lat: latitude, lng: longitude}
-			let marker = new google.maps.Marker({position: newPosition, map: maps[deviceId]});
-
-			marker.setTitle(datapoint.time + "\nUV index:" + datapoint.uv);
-			marker.setLabel();
-			marker.setClickable(true);
-			marker.setDraggable(false);
-
-
-        }
-
-       }
-
-     })
-     .fail(function(jqXHR, textStatus, errorThrown) {
-       let response = JSON.parse(jqXHR.responseText);
-       $("#error").html("Error: " + response.message);
-       $("#error").show();
-     }); 
-
-}
-
-function activityDevice(event, deviceId) {
-  $("#activityForm-"+deviceId).slideDown();
-}
-
-function closeActivity(event, deviceId) {
-  $("#activityForm-"+deviceId).slideUp();
-}
-
 
 function accountInfoError(jqXHR, textStatus, errorThrown) {
   // If authentication error, delete the authToken 
@@ -247,50 +43,129 @@ function accountInfoError(jqXHR, textStatus, errorThrown) {
   } 
 }
 
-// Registers the specified device with the server.
-function registerDevice() {
-  var alphanumericTest = /^[a-zA-Z0-9_]*$/;
-  if (alphanumericTest.test($('#deviceId').val())) {
-    $.ajax({
-      url: '/devices/register',
-      type: 'POST',
-      headers: { 'x-auth': window.localStorage.getItem("authToken") },  
-      contentType: 'application/json',
-      data: JSON.stringify({ deviceId: $("#deviceId").val(), email:$("#email").text() }), 
-      dataType: 'json'
-     })
-       .done(function (data, textStatus, jqXHR) {
-        location.reload();
-       })
-       .fail(function(jqXHR, textStatus, errorThrown) {
-         let response = JSON.parse(jqXHR.responseText);
-         $("#error").html("Error: " + response.message);
-         $("#error").show();
-       }); 
-  }
-  else {
-         $("#error").html("Error: only alphanumeric characters allowed");
-         $("#error").show();    
-  }
+function hideForecast() {
+  for (var i = 1; i < 5 + 1; i++)
+    $("#day"+i).hide();
+}
+
+function showForecast() {
+  for (var i = 1; i < 5 + 1; i++)
+    $("#day"+i).show();
+}
+
+function refreshForecast() {
+  let lat = $("#userLatitude").val();
+  let lon = $("#userLongitude").val();
+  $("#latitude").html(lat);
+  $("#longitude").html(lon);
+  getWeatherInfo();
 
 }
 
-function pingDevice(event, deviceId) {
-   $.ajax({
-        url: '/devices/ping',
-        type: 'POST',
-        headers: { 'x-auth': window.localStorage.getItem("authToken") },   
-        data: { 'deviceId': deviceId }, 
-        responseType: 'json',
-        success: function (data, textStatus, jqXHR) {
-            console.log("Pinged.");
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            var response = JSON.parse(jqXHR.responseText);
-            $("#error").html("Error: " + response.message);
-            $("#error").show();
-        }
-    }); 
+
+function getWeatherInfo() {
+  var lat = $("#userLatitude").val(); 
+  var lon = $("#userLongitude").val(); 
+  var valid = true; 
+  if(lat>90 || lat<-90 || isNaN(lat)){
+    // $("#error").html("Error: " + status.message);
+    // $("#error").show();
+
+
+    $("#error").html("latitude value needs to be between -90 and 90 degrees.");
+    $("#error").show(); 
+    return;
+  }
+  if(lon>180 || lon<-180 || isNaN(lon)){
+    $("#error").html("longitude value needs to be between -180 and 180 degrees.");
+    $("#error").show(); 
+    return;
+  }
+
+  $.ajax({
+    url: 'http://api.openweathermap.org/data/2.5/forecast?appid=6e5be09cc06697c608c9d8a12dda7698&lat='+lat+'&lon='+lon,
+    type: 'GET',
+    dataType: 'json'
+  })
+  .done(function(data, textSatus, jqXHR){ 
+    var humidity = [];
+    var temp = []; 
+    var header = [];  
+    var count = 0;
+    var weatherInfo = data.list;  
+
+    if(lat > 0){
+      $("#latitude").html(lat+'\u00B0'+" North"); 
+    }
+    else{
+      var latString = String(lat); 
+      var latString2 = latString.slice(1,); 
+      $("#latitude").html(latString2+'\u00B0'+" South"); 
+    }
+
+    if(lon > 0){
+      $("#longitude").html(lon+'\u00B0' + " East"); 
+    }
+    else{
+      var lonString = String(lon); 
+      var lonString2 = lonString.slice(1,); 
+      $("#longitude").html(lonString2+'\u00B0'+" West"); 
+    }
+
+    for(var i = 0; i<weatherInfo.length; i++){
+      if (i%8 == 4){
+        humidity.push(weatherInfo[i]["main"].humidity); 
+        var tk = Number(weatherInfo[i]["main"].temp);
+        var tf = ((tk-273.15)*9/5+32).toFixed(2); 
+        temp.push(tf);
+        var date = weatherInfo[i]["dt_txt"]; 
+        header.push(date.slice(0,10)); 
+      }
+      count++
+    }
+
+
+    for (var i = 0; i < 5; i++) {
+      $("#t"+(i+1)).html(temp[i] + '\u00B0'+"F"); 
+      $("#h"+(i+1)).html(humidity[i] + "%"); 
+      $("#head"+(i+1)).html(header[i]); 
+    }
+    getUVInfo();
+    showForecast();
+  })
+  .fail(function(jqXHR, textStatus, errorThrown){
+    let response = JSON.parse(jqXHR.responseText);
+    var error = $("<li class = 'collection-item'></li>");
+    error.html(response);
+    $("#updateErrorsList").append(error); 
+    $("#errors").show();  
+  })
+}
+
+
+function getUVInfo() {
+  var lat = $("#userLatitude").val(); 
+  var lon = $("#userLongitude").val(); 
+  $.ajax({
+    url: 'http://api.openweathermap.org/data/2.5/uvi/forecast?appid=6e5be09cc06697c608c9d8a12dda7698&lat='+lat+'&lon='+lon,
+    dataType: 'json'
+  })
+  .done(function(data, textSatus, jqXHR){ 
+    var uv = []; 
+    for(var uvIndex of data){
+      uv.push(uvIndex.value); 
+    }
+    for (var i = 0; i < 5; i++) {
+      $("#u"+(i+1)).html(uv[i]);
+    }
+  })
+  .fail(function(jqXHR, textStatus, errorThrown){
+    let response = JSON.parse(jqXHR.responseText);
+    var error = $("<li class = 'collection-item'></li>");
+    error.html(response);
+    $("#updateErrorsList").append(error); 
+    $("#errors").show();  
+  })
 }
 
 // Handle authentication on page load
@@ -303,8 +178,6 @@ $(function() {
   else {
     sendReqForAccountInfo();
   }
-  
-  // Register event listeners
-  $("#registerDevice").click(registerDevice);  
-  $("#cancel").click(hideAddDeviceForm);  
+    
+  $("#updateLocation").click(refreshForecast);  
 });
