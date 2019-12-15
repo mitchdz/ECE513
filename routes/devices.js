@@ -21,16 +21,32 @@ router.get('/newDevice', function(req, res, next) {
     message : "",
   };
 
-  if ( !req.body.hasOwnProperty("deviceId")) {
+  if ( !req.query.hasOwnProperty("deviceId")) {
     responseJson.message = "Missing deviceID.";
     return res.status(400).json(responseJson);
   }
 
-  let incomingDeviceId = req.body.deviceId;
+  let query = {deviceId:req.query.deviceId};
   
-  // check if the deviceID is pending assignment
-    // if pending, return generate APIKey
-    // if not, die.
+  Device.findOne(query,function(err, device) {
+    if (err || device == null) {
+      res.status(400).json({success:false, message:"This device has not yet been registered"});
+    }
+    else if(!device.deviceClaimed)
+    {
+      device.deviceClaimed = true;
+      Device.findByIdAndUpdate(device._id, device, function(err, user) {
+        if (err) {
+           return res.status(400).json(err);
+        }
+      });
+      res.status(200).json({message:device.apikey});
+    }
+    else
+    {
+      res.status(400).json({message:"Device already claimed"});
+    }
+  })
 });
 
 // router.get('/activities', function(req, res, next){
@@ -231,21 +247,24 @@ router.post('/addActivity', function(req, res, next) {
 
 
 router.get('/uvThreshold', function(req,res) {
-  var query = {deviceId:req.body.deviceId};
+  var query = {deviceId:req.query.deviceId};
   Device.findOne(query,function(err, device) {
-    if (err) {
+    if (err || device == null) {
       res.status(400).json({success:false, message:"No device with that id exists"});
     }
-    var userQuery = {email:device.userEmail};
-    Users.findOne(userQuery, function(err, user) {
-      if (err) {
-        res.status(400).json({success:false, message:"User could not be found."});
-      }
-      else {
-        var response = user.uvThreshold
-        res.status(200).json({message:response});
-      }
-    })
+    else
+    {
+      var userQuery = {email:device.userEmail};
+      Users.findOne(userQuery, function(err, user) {
+        if (err) {
+          res.status(400).json({success:false, message:"User could not be found."});
+        }
+        else {
+          var response = user.uvThreshold
+          res.status(200).json({message:response});
+        }
+      })
+    }
   })
 });
 
@@ -323,7 +342,8 @@ router.post('/register', function(req, res, next) {
     registered: false,
     message : "",
     apikey : "none",
-    deviceId : "none"
+    deviceId : "none",
+    deviceClaimed : false
   };
   let deviceExists = false;
   

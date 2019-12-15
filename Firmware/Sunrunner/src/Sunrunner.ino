@@ -3,6 +3,9 @@
 #include "SunrunnerGPS.h"
 #include "SunrunnerUV.h"
 #include "PingPattern.h"
+#include "UVPattern.h"
+
+
 
 SYSTEM_THREAD(ENABLED);
 
@@ -24,10 +27,14 @@ Mode deviceMode = AWAITING_AUTH;
 unsigned long authTimer = 0;
 
 PingPattern pingRGB = PingPattern(LED_PRIORITY_IMPORTANT);
+UVPattern uvRGB = UVPattern(LED_PRIORITY_IMPORTANT);
+
 unsigned long pingTimer = 0;
 boolean activePing = false;
 
 unsigned long activityNumber = 0;
+
+float uvThreshold = 5;
 
 
 boolean timerExceeds(unsigned long timer, unsigned long delay)
@@ -119,8 +126,21 @@ int startActivityInit(const char *event, const char *data)
 	return (activityNumber == 0) ? 1 : 0; //Returns 1 on failure
 }
 
+//Get new API key and replace EEPROM value of the key 
 int authReply(const char *event, const char *data)
 {
+	strncpy(apiKey, data, 32);
+	EEPROM.write(0, 1);
+
+	for(int i = 1; i < 33; i++)
+		EEPROM.write(i, (uint8_t) apiKey[i-1]);
+
+	return 0;
+}
+
+int uvReply(const char *event, const char *data)
+{
+	uvThreshold = atof(data);
 	return 0;
 }
 
@@ -133,6 +153,11 @@ void setup()
 	if(EEPROM.read(0) == 1)
 	{
 		deviceMode = IDLE;
+
+		for(int i = 1; i < 33; i++)
+			apiKey[i-1] = (char) EEPROM.read(i);
+
+		apiKey[32] = '\0';
 	}
 
 	Particle.function("getdata", publishData);
@@ -141,10 +166,14 @@ void setup()
     pinMode(BTN, INPUT);
     Particle.subscribe("hook-response/startActivity", startActivityInit, MY_DEVICES);
 	Particle.subscribe("hook-response/requestAuth", authReply, MY_DEVICES);
+	Particle.subscribe("hook-response/uvthreshold", uvReply, MY_DEVICES);
 
 	delay(1000);
 
 	Particle.connect();
+
+	//Get user uv threshold
+	Particle.publish("uvthreshold", "{ \"deviceID\":\"" + System.deviceID() + "\"}", PUBLIC);
 }
 
 void loop()
@@ -154,13 +183,19 @@ void loop()
 		//Request every 10 seconds
 		if(timerExceeds(authTimer, 10000))
 		{
-			Particle.publish("requestAuth", "{ \"deviceID\" = \"" + System.deviceID() + "\"}", PUBLIC);
+			//Particle.publish("requestAuth", "{ \"deviceID\":\"" + System.deviceID() + "\"}", PUBLIC);
 		}
 	}
 	else
 	{
 		gps.readGPSData();
 		uv.readValues();
+
+		if(uv.getUVIndex() >= uvThreshold)
+			uvRGB.setActive();
+		else
+			uvRGB.setActive(false);
+		
 
 		if(activePing)
 		{
