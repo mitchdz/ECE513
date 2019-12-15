@@ -2,6 +2,7 @@ let express = require('express');
 let router = express.Router();
 let Device = require("../models/device");
 let DeviceData = require("../models/deviceData");
+let Users = require("../models/users");
 let fs = require('fs');
 let jwt = require("jwt-simple");
 
@@ -173,12 +174,12 @@ router.post('/addActivity', function(req, res) {
 
 
 router.get('/uvThreshold', function(req,res) {
-  var query = {id:req.query.id};
-  Devices.findOne(query,function(err, device) {
+  var query = {deviceId:req.body.deviceId};
+  Device.findOne(query,function(err, device) {
     if (err) {
       res.status(400).json({success:false, message:"No device with that id exists"});
     }
-    var userQuery = {email:device.email};
+    var userQuery = {email:device.userEmail};
     Users.findOne(userQuery, function(err, user) {
       if (err) {
         res.status(400).json({success:false, message:"User could not be found."});
