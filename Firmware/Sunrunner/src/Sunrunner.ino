@@ -4,6 +4,8 @@
 #include "SunrunnerUV.h"
 #include "PingPattern.h"
 
+
+
 SYSTEM_THREAD(ENABLED);
 
 SunrunnerGPS gps;
@@ -28,6 +30,8 @@ unsigned long pingTimer = 0;
 boolean activePing = false;
 
 unsigned long activityNumber = 0;
+
+float uvThreshold = 5;
 
 
 boolean timerExceeds(unsigned long timer, unsigned long delay)
@@ -131,6 +135,24 @@ int authReply(const char *event, const char *data)
 	return 0;
 }
 
+int uvReply(const char *event, const char *data)
+{
+	char * messageLoc = strstr(data, "message:");
+	
+	if(*messageLoc == '\0')
+	{
+		Particle.publish("uvfail", data, PUBLIC);
+		return -1;
+	}
+	else
+	{
+		messageLoc += 8;
+		uvThreshold = atof(messageLoc);
+		Particle.publish("uv", String(uvThreshold), PUBLIC);
+		return (int) (uvThreshold * 100);
+	}
+}
+
 void setup()
 {
 	gps.begin();
@@ -153,10 +175,14 @@ void setup()
     pinMode(BTN, INPUT);
     Particle.subscribe("hook-response/startActivity", startActivityInit, MY_DEVICES);
 	Particle.subscribe("hook-response/requestAuth", authReply, MY_DEVICES);
+	Particle.subscribe("hook-response/uvthreshold", uvReply, MY_DEVICES);
 
 	delay(1000);
 
 	Particle.connect();
+
+	//Get user uv threshold
+	Particle.publish("uvthreshold", "{ \"deviceID\":\"" + System.deviceID() + "\"}", PUBLIC);
 }
 
 void loop()
@@ -166,7 +192,7 @@ void loop()
 		//Request every 10 seconds
 		if(timerExceeds(authTimer, 10000))
 		{
-			Particle.publish("requestAuth", "{ \"deviceID\" = \"" + System.deviceID() + "\"}", PUBLIC);
+			//Particle.publish("requestAuth", "{ \"deviceID\":\"" + System.deviceID() + "\"}", PUBLIC);
 		}
 	}
 	else
