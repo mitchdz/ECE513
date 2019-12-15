@@ -6,6 +6,7 @@ var deviceDataSchema = new db.Schema({
     gps_long:   [Number],
     uv:         [Number],
     timeStarted: Date,
+    timeAdded: Number,
     deviceId:   { type: String, required: true },
     APIkey:     String,
     temperature: Number,
@@ -15,6 +16,6 @@ var deviceDataSchema = new db.Schema({
     duration: Number
 });
 
-var DeviceData = db.model("DeviceData", deviceDataSchema);
+var DeviceData = db.model("activity", deviceDataSchema);
 
 module.exports = DeviceData;

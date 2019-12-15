@@ -1,5 +1,3 @@
-var maps = {}
-
 function sendReqForAccountInfo() {
   $.ajax({
     url: '/users/account',
@@ -9,21 +7,6 @@ function sendReqForAccountInfo() {
   })
     .done(accountInfoSuccess)
     .fail(accountInfoError);
-}
-
-function initMap()
-{
-	$('.map').each(function (index, Element) {
-		devid = Element.innerHTML
-
-		map = new google.maps.Map(Element, 
-		{
-			center: {lat:32.221667, lng:-110.926389},
-			zoom: 12
-		});
-
-		maps[devid] = map;
-	});
 }
 
 function accountInfoSuccess(data, textSatus, jqXHR) {
@@ -36,88 +19,10 @@ function accountInfoSuccess(data, textSatus, jqXHR) {
   // Add the devices to the list before the list item for the add device button (link)
   for (let device of data.devices) {
     $("#addDeviceForm").before("<li class='collection-item'>ID: " +
-      device.deviceId + ", APIKEY: " + device.apikey + "<br>" +
-      " <button id='ping-" + device.deviceId + "' class='waves-effect waves-light btn'>Ping</button> " +
-      " <button id='activity-" + device.deviceId + "' class='waves-effect waves-light btn'>Activity</button> " +
-
-      " <li class='collection-item' id='activityForm-" + device.deviceId + "'>" +
-      " <div id=map-" + device.deviceId + " class=map style=\"height: 30vh; max-width:40vw;\">" + device.deviceId + "</div>" +
-      " <p id=data-" + device.deviceId + "></p>" +
-      " <button id='refresh-" + device.deviceId + "' class='waves-effect waves-light btn'>Refresh</button> " +
-      " <button id='close-" + device.deviceId + "' class='waves-effect waves-light btn'>Close</button> " +
-      " </li>" +
+      "<span class='ID'> " + device.deviceId + "</span>, APIKEY: <span class='ID'> " + device.apikey + "</span><br>" +
       " </li>");
-    //var map = new google.maps.Map(document.getElementById('#map-' + device.deviceId), {zoom: 7, center: {lat:32.221667, lng:-110.926389}});
-    $("#activityForm-"+device.deviceId).slideUp();
-    $("#ping-"+device.deviceId).click(function(event) {
-      pingDevice(event, device.deviceId);
-    });
-    $("#activity-"+device.deviceId).click(function(event) {
-      activityDevice(event, device.deviceId);
-    });
-    $("#close-"+device.deviceId).click(function(event) {
-      closeActivity(event, device.deviceId);
-    });
-    $("#refresh-"+device.deviceId).click(function(event) {
-      refreshActivity(event, device.deviceId);
-    });
   }
-
-  initMap();
 }
-
-function refreshActivity(event, deviceId) {
-  $.ajax({
-    url: '/devices/getData',
-    type: 'GET',
-    headers: " 'x-auth'=" +  window.localStorage.getItem("authToken"),  
-    dataType: 'json'
-   })
-     .done(function (data, textStatus, jqXHR) {
-      //  console.log(data);
-       for(let datapoint of data.data) {
-        // console.log(datapoint);
-
-        let devicesList = { data: [] };
-        if (datapoint.deviceId == deviceId) {
-			let latitude = datapoint.gps_lat;
-			let longitude = datapoint.gps_long;
-
-			$('#data-'+deviceId).text("longitude: " + longitude +
-                                    " latitude: " + latitude +
-                                    " gps_speed: " + datapoint.gps_speed +
-                                    " uv: " + datapoint.uv);
-
-			let newPosition = {lat: latitude, lng: longitude}
-			let marker = new google.maps.Marker({position: newPosition, map: maps[deviceId]});
-
-			marker.setTitle(datapoint.time + "\nUV index:" + datapoint.uv);
-			marker.setLabel();
-			marker.setClickable(true);
-			marker.setDraggable(false);
-
-
-        }
-
-       }
-
-     })
-     .fail(function(jqXHR, textStatus, errorThrown) {
-       let response = JSON.parse(jqXHR.responseText);
-       $("#error").html("Error: " + response.message);
-       $("#error").show();
-     }); 
-
-}
-
-function activityDevice(event, deviceId) {
-  $("#activityForm-"+deviceId).slideDown();
-}
-
-function closeActivity(event, deviceId) {
-  $("#activityForm-"+deviceId).slideUp();
-}
-
 
 function accountInfoError(jqXHR, textStatus, errorThrown) {
   // If authentication error, delete the authToken 
@@ -158,24 +63,6 @@ function registerDevice() {
          $("#error").show();    
   }
 
-}
-
-function pingDevice(event, deviceId) {
-   $.ajax({
-        url: '/devices/ping',
-        type: 'POST',
-        headers: { 'x-auth': window.localStorage.getItem("authToken") },   
-        data: { 'deviceId': deviceId }, 
-        responseType: 'json',
-        success: function (data, textStatus, jqXHR) {
-            console.log("Pinged.");
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            var response = JSON.parse(jqXHR.responseText);
-            $("#error").html("Error: " + response.message);
-            $("#error").show();
-        }
-    }); 
 }
 
 // Show add device form and hide the add device button (really a link)
