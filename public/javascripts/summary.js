@@ -115,18 +115,24 @@ function updateTotalView(devices) {
       })
       .done(function(data, textStatus, jqXHR) {
         for (activity of data.activities) {
-          let calories = Number($("#totalCalories").html()) + activity.calories; 
-          $("#totalCalories").html(calories); 
-          let duration = Number($("#totalDuration").html()) + activity.duration; 
-          $("#totalDuration").html(duration); 
 
-          let tempSum = 0;
-          for (tempUv of activity.uv) {
-            tempSum += tempUv;
+          let time = new Date();
+          let currentTime = time.getTime();
+
+          if ((currentTime - activity.timeAdded) < 604800000) {
+            let calories = Number($("#totalCalories").html()) + activity.calories; 
+            $("#totalCalories").html(calories); 
+            let duration = Number($("#totalDuration").html()) + activity.duration; 
+            $("#totalDuration").html(duration); 
+
+            let tempSum = 0;
+            for (tempUv of activity.uv) {
+              tempSum += tempUv;
+            }
+
+            let uv = Number($("#totalUv").html()) + tempSum; 
+            $("#totalUv").html(uv); 
           }
-
-          let uv = Number($("#totalUv").html()) + tempSum; 
-          $("#totalUv").html(uv); 
         }
       })
       .fail(function(data, textStatus, jqXHR) {
