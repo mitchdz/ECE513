@@ -9,59 +9,59 @@ function sendReqForAccountInfo() {
     .fail(accountInfoError);
 }
 
-// function accountInfoSuccess(data, textSatus, jqXHR) {
-//   $("#email").html(data.email);
-//   $("#fullName").html(data.fullName);
-//   $("#lastAccess").html(data.lastAccess);
-//   $("#uvThreshold").html(data.uvThreshold);
-//   $("#main").show();
-  
-//   // Add the devices to the list before the list item for the add device button (link)
-//   for (let device of data.devices) {
-//     $("#addDeviceForm").before("<li class='collection-item'>ID: " +
-//       device.deviceId + ", APIKEY: " + device.apikey + "<br>" +
-//       " <button id='ping-" + device.deviceId + "' class='waves-effect waves-light btn'>Ping</button> " +
-//       " <button id='activity-" + device.deviceId + "' class='waves-effect waves-light btn'>Activity</button> " +
-
-//       " <li class='collection-item' id='activityForm-" + device.deviceId + "'>" +
-//       " <div id=map-" + device.deviceId + " class=map style=\"height: 30vh; max-width:40vw;\">" + device.deviceId + "</div>" +
-//       " <p id=data-" + device.deviceId + "></p>" +
-//       " <button id='refresh-" + device.deviceId + "' class='waves-effect waves-light btn'>Refresh</button> " +
-//       " <button id='close-" + device.deviceId + "' class='waves-effect waves-light btn'>Close</button> " +
-//       " </li>" +
-//       " </li>");
-//     //var map = new google.maps.Map(document.getElementById('#map-' + device.deviceId), {zoom: 7, center: {lat:32.221667, lng:-110.926389}});
-//     $("#activityForm-"+device.deviceId).slideUp();
-//     $("#activity-"+device.deviceId).click(function(event) {
-//       activityDevice(event, device.deviceId);
-//     });
-//     $("#close-"+device.deviceId).click(function(event) {
-//       closeActivity(event, device.deviceId);
-//     });
-//     $("#refresh-"+device.deviceId).click(function(event) {
-//       refreshActivity(event, device.deviceId);
-//     });
-//   }
-
-//   initMap();
-// }
-
-
 function accountInfoSuccess(data, textSatus, jqXHR) {
   $("#email").html(data.email);
   $("#fullName").html(data.fullName);
+  $("#lastAccess").html(data.lastAccess);
+  $("#uvThreshold").html(data.uvThreshold);
   $("#main").show();
+  
+  // Add the devices to the list before the list item for the add device button (link)
+  for (let device of data.devices) {
+    $("#addDeviceForm").before("<li class='collection-item'>ID: " +
+      device.deviceId + ", APIKEY: " + device.apikey + "<br>" +
+      " <button id='ping-" + device.deviceId + "' class='waves-effect waves-light btn'>Ping</button> " +
+      " <button id='activity-" + device.deviceId + "' class='waves-effect waves-light btn'>Activity</button> " +
 
-  $("#totalDuration").html(0);
-  $("#totalCalories").html(0);
-  $("#totalUv").html(0);
-
-  updateTotalView(data.devices);
-  // populateActivitiesSummaryView(data.devices);
-  for (device of data.devices) {
-    showActivities(device);
+      " <li class='collection-item' id='activityForm-" + device.deviceId + "'>" +
+      " <div id=map-" + device.deviceId + " class=map style=\"height: 30vh; max-width:40vw;\">" + device.deviceId + "</div>" +
+      " <p id=data-" + device.deviceId + "></p>" +
+      " <button id='refresh-" + device.deviceId + "' class='waves-effect waves-light btn'>Refresh</button> " +
+      " <button id='close-" + device.deviceId + "' class='waves-effect waves-light btn'>Close</button> " +
+      " </li>" +
+      " </li>");
+    //var map = new google.maps.Map(document.getElementById('#map-' + device.deviceId), {zoom: 7, center: {lat:32.221667, lng:-110.926389}});
+    $("#activityForm-"+device.deviceId).slideUp();
+    $("#activity-"+device.deviceId).click(function(event) {
+      activityDevice(event, device.deviceId);
+    });
+    $("#close-"+device.deviceId).click(function(event) {
+      closeActivity(event, device.deviceId);
+    });
+    $("#refresh-"+device.deviceId).click(function(event) {
+      refreshActivity(event, device.deviceId);
+    });
   }
+
+  initMap();
 }
+
+
+// function accountInfoSuccess(data, textSatus, jqXHR) {
+//   $("#email").html(data.email);
+//   $("#fullName").html(data.fullName);
+//   $("#main").show();
+
+//   $("#totalDuration").html(0);
+//   $("#totalCalories").html(0);
+//   $("#totalUv").html(0);
+
+//   updateTotalView(data.devices);
+//   // populateActivitiesSummaryView(data.devices);
+//   for (device of data.devices) {
+//     showActivities(device);
+//   }
+// }
 
 function openActivitiesSummary(deviceId) {
   $("#activitiesSummaryDisplay-"+device.deviceId).slideDown();
