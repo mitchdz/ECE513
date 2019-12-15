@@ -33,9 +33,38 @@ router.get('/newDevice', function(req, res, next) {
     // if not, die.
 });
 
+// router.get('/activities', function(req, res, next){
+//   let responseJson = { activities: [] };
+//   let id = req.headers["deviceId"];
+//   DeviceData.find({deviceId:id}, function(err, activities){
+//     if(err){
+//       res.status(400).json({success:false, message:"No devices found"});
+//     }
+//     else{
+//       return res.status(200).json(err);
+//       for(activity of activities){
+//         responseJson.activities.push({"deviceId":activity.deviceId});
+//       }
+//       res.status(200).json(responseJson);
+//     }
+//   });
+// });
 
-
-
+router.get('/activities', function(req, res, next){
+  var id = req.headers["device"];
+  let responseJson = { activities: [] };
+  DeviceData.find({deviceId:id}, function(err, activities){
+    if(err){
+      res.status(400).json({success:false, message:"No devices found"});
+    }
+    else{
+      for(activity of activities){
+        responseJson.activities.push(activity);
+      }
+      res.status(200).json(responseJson);
+    }
+  });
+});
 
 router.post('/delete', function(req, res, next) {
   if (!req.body.hasOwnProperty("deviceId")) {
@@ -82,12 +111,20 @@ router.post('/delete', function(req, res, next) {
 
 
 
-router.post('/addActivity', function(req, res) {
+router.post('/addActivity', function(req, res, next) {
   req.body = JSON.parse(req.body.data); // data is stored in a weird fashion
 
-  // make sure APIkey is what it should be
-
-
+  // make sure two activities with same date can not be added
+  // current causes issue "Cannot set headers after they are sent to the client"
+  // let timeQuery = {timeStarted:req.body.time};
+  // DeviceData.findOne(timeQuery, function(err, activity) {
+  //   if (err) {
+  //     return res.status(400).json(err);
+  //   }
+  //   if (activity) {
+  //     return res.status(400).json({succes:"false", message:"activity with start time already exists"});
+  //   }
+  // });
 
 
   var tempLong = req.body.gps_long.trim().split(" ");
@@ -144,6 +181,9 @@ router.post('/addActivity', function(req, res) {
     var calories = (10*duration).toFixed(2);
   }
 
+  var time = new Date();
+  var currentTime = time.getTime();
+
   let newActivity = new DeviceData({
     deviceId:req.body.deviceId,
     gps_long:tempLong,
@@ -151,6 +191,7 @@ router.post('/addActivity', function(req, res) {
     gps_speed:tempSpeed,
     uv:tempUV,
     timeStarted:req.body.time,
+    timeAdded:currentTime,
     duration:duration,
     type:activity,
     calories:calories,

@@ -294,10 +294,6 @@ router.put("/updateName", function(req, res) {
    }
 });
 
-
-
-
-
 router.get("/account" , function(req, res) {
    // Check for authentication token in x-auth header
    if (!req.headers["x-auth"]) {
