@@ -359,13 +359,20 @@ function addActivityToSummary(activity) {
   var uvDiv = $("<div style='margin-bottom:10px;height: 400px; wide:100%;'></div>");
   uvDiv.attr('id', 'uvContainer' + activity.timeAdded); 
 
+
+  var mapDiv = $("<div style='margin-bottom:10px;height: 400px; width: 100%;'></div>");
+  mapDiv.attr('id', 'mapContainer' + activity.timeAdded);
+
+
+
   var button = $("<button class='waves-effect waves-light btn'>Collapse</button>"); 
   button.click(function(){
     $(this).parent().parent().children().eq(9).slideUp(); 
     $(this).parent().parent().children().eq(7).show(); 
   })
   summaryForm.append(speedDiv);
-  summaryForm.append(uvDiv);  
+  summaryForm.append(uvDiv);
+  summaryForm.append(mapDiv);
   summaryForm.append(button);
   summaryForm.hide();  
 
