@@ -96,37 +96,120 @@ chart.render();
 }
 
 
-function updateTotalsView(data) {
+function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+  let radiusEarth = 6371; //km
+  let dLat = toRad(lat2-lat1);
+  let dLon = toRad(lon2-lon1); 
+  let a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2); 
+  let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+  let distance = radiusEarth * c; //Distance in km
+  return distance;
+}
+
+function toRad(deg) {
+  return deg * (Math.PI/180)
+}
 
 
+var durationList = [0, 0, 0];
+var caloriesList = [0, 0, 0];
+var uvList = [0, 0, 0];
+
+function updateTotalsView(userDevices) {
+  var listOfPersonalActivities = [];
+  $.ajax({
+    url: '/devices/allActivities', 
+    type: 'GET', 
+    dataType: 'json', 
+  })
+  .done(function(data, textStatus, jqXHR) {
+    listOfPersonalActivities = [];
+    for (activity of data.activities) {
+      let isPersonal = false;
+      let isLocal = false;
+
+      for (device of userDevices) {
+        if (device.deviceId == activity.deviceId) {
+          listOfPersonalActivities.push({lat:activity.gps_lat[0], lon:activity.gps_long[0]});
+          isPersonal = true;
+        }
+      }
+
+      var minimumDistance = 99999999; // arbitrarily large number
+      for (personalActivity of listOfPersonalActivities) {
+        console.log(personalActivity);
+        var distanceBetweenKm = getDistanceFromLatLonInKm(personalActivity.lat, personalActivity.lon, activity.gps_lat[0], activity.gps_long[0]);
+        console.log("distance: " + distanceBetweenKm);
+        console.log(distanceBetweenKm);
+        if (distanceBetweenKm < minimumDistance) {
+          minimumDistance = distanceBetweenKm;
+        }
+      }
+
+      console.log("minimum: " + minimumDistance);
+      if (minimumDistance < 100) {
+        isLocal = true;
+      }
+
+      let time = new Date();
+      let currentTime = time.getTime();
+      if ((currentTime - activity.timeAdded) < 604800000) {
+
+        let tempUvSum = 0;
+        for (tempUv of activity.uv) {
+          tempUvSum += tempUv;
+        }
+
+        let i = 0;
+        if (isPersonal) {
+          durationList[i] = durationList[i] + activity.duration;
+          caloriesList[i] = caloriesList[i] + activity.calories;
+          uvList[i] = uvList[i] + tempUvSum;
+        }
+
+        i = 1;
+        if (isLocal) {
+          durationList[i] = durationList[i] + activity.duration;
+          caloriesList[i] = caloriesList[i] + activity.calories;
+          uvList[i] = uvList[i] + tempUvSum;
+        }
+
+        i = 2;
+        durationList[i] = durationList[i] + activity.duration;
+        caloriesList[i] = caloriesList[i] + activity.calories;
+        uvList[i] = uvList[i] + tempUvSum;
+      }
+    }
+    console.log(listOfPersonalActivities);
+
+    createSevenDayGraph(sevenDayContainerDuration, 
+                        "Seven Day Total Duration", 
+                        "minutes", 
+                        "user category",
+                        ["personal", "local users", "all users"],
+                        durationList);
 
 
+    createSevenDayGraph(sevenDayContainerCalories, 
+                        "Seven Day Total Calories Burned", 
+                        "calories", 
+                        "user category",
+                        ["personal", "local users", "all users"],
+                        caloriesList);
 
 
-  createSevenDayGraph(sevenDayContainerDuration, 
-                      "Seven Day Duration", 
-                      "minutes", 
-                      "category",
-                      ["personal", "local", "all"],
-                      [4.5, 7, 12]);
-
-
-  createSevenDayGraph(sevenDayContainerCalories, 
-                      "Seven Day Calories Burned", 
-                      "calories", 
-                      "category",
-                      ["personal", "local", "all"],
-                      [1000, 2000, 2500]);
-
-
-  createSevenDayGraph(sevenDayContainerUv, 
-                      "Seven Day UV exposure", 
-                      "uv exposure", 
-                      "category",
-                      ["personal", "local", "all"],
-                      [120, 190, 304]);
-
-
+    createSevenDayGraph(sevenDayContainerUv, 
+                        "Seven Day Total UV exposure", 
+                        "uv exposure", 
+                        "user category",
+                        ["personal", "local users", "all users"],
+                        uvList);
+  })
+  .fail(function(data, textStatus, jqXHR) {
+    console.log(jqXHR);
+  });
 }
 
 
@@ -142,7 +225,7 @@ function accountInfoSuccess(data, textSatus, jqXHR) {
   $("#totalCalories").html(0);
   $("#totalUv").html(0);
 
-  updateTotalsView(data);
+  updateTotalsView(data.devices);
 
   for (let device of data.devices) {
     showActivities(device);

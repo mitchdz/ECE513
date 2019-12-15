@@ -66,6 +66,22 @@ router.get('/activities', function(req, res, next){
   });
 });
 
+router.get('/allActivities', function(req, res, next){
+  let responseJson = { activities: [] };
+  DeviceData.find(function(err, activities){
+    if(err){
+      res.status(400).json({success:false, message:"Error looking for devices"});
+    }
+    else{
+      for(activity of activities){
+        responseJson.activities.push(activity);
+      }
+      res.status(200).json(responseJson);
+    }
+  });
+});
+
+
 router.post('/delete', function(req, res, next) {
   if (!req.body.hasOwnProperty("deviceId")) {
     res.status(400).json({success:false, message:"Missing deviceId"});
