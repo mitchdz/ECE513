@@ -3,6 +3,7 @@
 #include "SunrunnerGPS.h"
 #include "SunrunnerUV.h"
 #include "PingPattern.h"
+#include "UVPattern.h"
 
 
 
@@ -26,6 +27,8 @@ Mode deviceMode = AWAITING_AUTH;
 unsigned long authTimer = 0;
 
 PingPattern pingRGB = PingPattern(LED_PRIORITY_IMPORTANT);
+UVPattern uvRGB = UVPattern(LED_PRIORITY_IMPORTANT);
+
 unsigned long pingTimer = 0;
 boolean activePing = false;
 
@@ -137,20 +140,8 @@ int authReply(const char *event, const char *data)
 
 int uvReply(const char *event, const char *data)
 {
-	char * messageLoc = strstr(data, "message:");
-	
-	if(*messageLoc == '\0')
-	{
-		Particle.publish("uvfail", data, PUBLIC);
-		return -1;
-	}
-	else
-	{
-		messageLoc += 8;
-		uvThreshold = atof(messageLoc);
-		Particle.publish("uv", String(uvThreshold), PUBLIC);
-		return (int) (uvThreshold * 100);
-	}
+	uvThreshold = atof(data);
+	return 0;
 }
 
 void setup()
@@ -199,6 +190,12 @@ void loop()
 	{
 		gps.readGPSData();
 		uv.readValues();
+
+		if(uv.getUVIndex() >= uvThreshold)
+			uvRGB.setActive();
+		else
+			uvRGB.setActive(false);
+		
 
 		if(activePing)
 		{
