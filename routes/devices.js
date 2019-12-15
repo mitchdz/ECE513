@@ -215,7 +215,8 @@ router.post('/addActivity', function(req, res, next) {
 
 
 router.get('/uvThreshold', function(req,res) {
-  var query = {deviceId:req.body.deviceId};
+  console.log(req.body, req.query);
+  var query = {deviceId:req.query.deviceId};
   Device.findOne(query,function(err, device) {
     if (err) {
       res.status(400).json({success:false, message:"No device with that id exists"});
