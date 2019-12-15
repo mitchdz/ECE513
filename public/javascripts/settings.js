@@ -9,6 +9,21 @@ function sendReqForAccountInfo() {
     .fail(accountInfoError);
 }
 
+function initMap()
+{
+  $('.map').each(function (index, Element) {
+    devid = Element.innerHTML
+
+    map = new google.maps.Map(Element, 
+    {
+      center: {lat:32.221667, lng:-110.926389},
+      zoom: 12
+    });
+
+    maps[devid] = map;
+  });
+}
+
 function accountInfoSuccess(data, textSatus, jqXHR) {
   $("#uv").html(data.uvThreshold);
   $("#email").html(data.email);
