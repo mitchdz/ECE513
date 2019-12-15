@@ -19,7 +19,7 @@ function accountInfoSuccess(data, textSatus, jqXHR) {
   // Add the devices to the list before the list item for the add device button (link)
   for (let device of data.devices) {
     $("#addDeviceForm").before("<li class='collection-item'>ID: " +
-      device.deviceId + ", APIKEY: " + device.apikey + "<br>" +
+      "<span class='ID'> " + device.deviceId + "</span>, APIKEY: <span class='ID'> " + device.apikey + "</span><br>" +
       " <button id='replace-" + device.deviceId + "' class='waves-effect waves-light btn'>Replace</button> " +
 
       " <li class='collection-item' id='replaceForm-" + device.deviceId + "'>" +
@@ -40,8 +40,6 @@ function accountInfoSuccess(data, textSatus, jqXHR) {
     $("#SubmitReplace-"+device.deviceId).click(function(event) {
       SubmitReplace(event, device.deviceId);
     }); 
-
-
   }
 }
 
@@ -260,6 +258,48 @@ function updateName() {
 
 }
 
+// Show add device form and hide the add device button (really a link)
+function showAddDeviceForm() {
+  $("#deviceId").val("");        // Clear the input for the device ID
+  $("#addDeviceControl").hide();   // Hide the add device link
+  $("#addDeviceForm").slideDown();  // Show the add device form
+}
+
+// Hides the add device form and shows the add device button (link)
+function hideAddDeviceForm() {
+  $("#addDeviceControl").show();  // Hide the add device link
+  $("#addDeviceForm").slideUp();  // Show the add device form
+  $("#error").hide();
+}
+
+// Registers the specified device with the server.
+function registerDevice() {
+  var alphanumericTest = /^[a-zA-Z0-9_]*$/;
+  if (alphanumericTest.test($('#deviceId').val())) {
+    $.ajax({
+      url: '/devices/register',
+      type: 'POST',
+      headers: { 'x-auth': window.localStorage.getItem("authToken") },  
+      contentType: 'application/json',
+      data: JSON.stringify({ deviceId: $("#deviceId").val(), email:$("#email").text() }), 
+      dataType: 'json'
+     })
+       .done(function (data, textStatus, jqXHR) {
+        location.reload();
+       })
+       .fail(function(jqXHR, textStatus, errorThrown) {
+         let response = JSON.parse(jqXHR.responseText);
+         $("#error").html("Error: " + response.message);
+         $("#error").show();
+       }); 
+  }
+  else {
+         $("#error").html("Error: only alphanumeric characters allowed");
+         $("#error").show();    
+  }
+
+}
+
 // Handle authentication on page load
 $(function() {
   // If there's no authToekn stored, redirect user to 
@@ -288,5 +328,8 @@ $(function() {
   $("#updateUv").click(updateUv);  
   $("#UvCancel").click(hideUvForm);  
 
-
+  // Register event listeners
+  $("#addDevice").click(showAddDeviceForm);
+  $("#registerDevice").click(registerDevice);  
+  $("#cancel").click(hideAddDeviceForm);  
 });
