@@ -215,22 +215,24 @@ router.post('/addActivity', function(req, res, next) {
 
 
 router.get('/uvThreshold', function(req,res) {
-  console.log(req.body, req.query);
   var query = {deviceId:req.query.deviceId};
   Device.findOne(query,function(err, device) {
-    if (err) {
+    if (err || device == null) {
       res.status(400).json({success:false, message:"No device with that id exists"});
     }
-    var userQuery = {email:device.userEmail};
-    Users.findOne(userQuery, function(err, user) {
-      if (err) {
-        res.status(400).json({success:false, message:"User could not be found."});
-      }
-      else {
-        var response = user.uvThreshold
-        res.status(200).json({message:response});
-      }
-    })
+    else
+    {
+      var userQuery = {email:device.userEmail};
+      Users.findOne(userQuery, function(err, user) {
+        if (err) {
+          res.status(400).json({success:false, message:"User could not be found."});
+        }
+        else {
+          var response = user.uvThreshold
+          res.status(200).json({message:response});
+        }
+      })
+    }
   })
 });
 
