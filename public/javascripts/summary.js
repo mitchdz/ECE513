@@ -68,6 +68,67 @@ function updateSummarynewCollection(data) {
   }
 }
 
+function createSevenDayGraph(chartName, chartTitle, yLabel, xLabel, labels, values) {
+var chart = new CanvasJS.Chart(chartName, {
+  animationEnabled: true,
+  theme: "light2", // "light1", "light2", "dark1", "dark2"
+  title:{
+    text: chartTitle
+  },
+  axisY: {
+    title: yLabel
+  },
+  axisX: {
+    title: xLabel
+  },
+  data: [{        
+    type: "column",  
+    legendMarkerColor: "grey",
+    dataPoints: [      
+      { y: values[0], label: labels[0] },
+      { y: values[1],  label: labels[1] },
+      { y: values[2],  label: labels[2] }
+    ]
+  }]
+});
+chart.render();
+
+}
+
+
+function updateTotalsView(data) {
+
+
+
+
+
+
+  createSevenDayGraph(sevenDayContainerDuration, 
+                      "Seven Day Duration", 
+                      "minutes", 
+                      "category",
+                      ["personal", "local", "all"],
+                      [4.5, 7, 12]);
+
+
+  createSevenDayGraph(sevenDayContainerCalories, 
+                      "Seven Day Calories Burned", 
+                      "calories", 
+                      "category",
+                      ["personal", "local", "all"],
+                      [1000, 2000, 2500]);
+
+
+  createSevenDayGraph(sevenDayContainerUv, 
+                      "Seven Day UV exposure", 
+                      "uv exposure", 
+                      "category",
+                      ["personal", "local", "all"],
+                      [120, 190, 304]);
+
+
+}
+
 
 function accountInfoSuccess(data, textSatus, jqXHR) {
   $("#email").html(data.email);
@@ -76,7 +137,13 @@ function accountInfoSuccess(data, textSatus, jqXHR) {
   $("#uvThreshold").html(data.uvThreshold);
   $("#main").show();
 
-  updateTotalView(data.devices);
+
+  $("#totalDuration").html(0);
+  $("#totalCalories").html(0);
+  $("#totalUv").html(0);
+
+  updateTotalsView(data);
+
   for (let device of data.devices) {
     showActivities(device);
   }
@@ -178,6 +245,7 @@ function addActivityToSummary(activity) {
     sum += activity.uv[i]; 
   }
   newCollection.append("<li class='collection-header'><h5>" + activity.timeStarted + "</h5></li>");  
+  newCollection.append("<li class = 'collection-item'>Device ID: " + activity.deviceId + "</li>");
   newCollection.append("<li class = 'collection-item'>Workout Type: " + activity.type + "</li>"); 
   newCollection.append("<li class = 'collection-item'>Duration: " + activity.duration + " Minutes</li>"); 
   newCollection.append("<li class = 'collection-item'>Calories Burned: " + activity.calories + "</li>"); 
@@ -188,13 +256,13 @@ function addActivityToSummary(activity) {
   let summary = $("<li class = 'collection-item' id='summary" + activity.timeAdded + "'></li>"); 
   let link = $("<a href = '#!' style = 'padding-right:20px;' id='link' + " + activity.timeAdded + "'>Activity Detail View</a>");
   link.click(function(){
-    $(this).parent().parent().children().eq(8).slideDown();
+    $(this).parent().parent().children().eq(9).slideDown();
     $(this).parent().parent().children().eq(7).hide();
   })
 
   let updateType = $("<a href = '#!'>Change Workout Type</a>"); 
   updateType.click(function(){
-    $(this).parent().parent().children().eq(9).slideDown(); 
+    $(this).parent().parent().children().eq(10).slideDown(); 
     $(this).parent().parent().children().eq(7).hide(); 
   });
 
@@ -204,13 +272,13 @@ function addActivityToSummary(activity) {
 
   var summaryForm = $("<li class='collection-item'></li>"); 
   var speedDiv = $("<div style='margin-bottom:10px;height: 400px; width: 100%;'></div>");
-  speedDiv.attr('id', 'speedContainer' + activity.timeAdded); 
+  speedDiv.attr('id', 'speedContainer' + activity.timeAdded);
   var uvDiv = $("<div style='margin-bottom:10px;height: 400px; wide:100%;'></div>");
   uvDiv.attr('id', 'uvContainer' + activity.timeAdded); 
 
   var button = $("<button class='waves-effect waves-light btn'>Collapse</button>"); 
   button.click(function(){
-    $(this).parent().parent().children().eq(8).slideUp(); 
+    $(this).parent().parent().children().eq(9).slideUp(); 
     $(this).parent().parent().children().eq(7).show(); 
   })
   summaryForm.append(speedDiv);
@@ -223,7 +291,7 @@ function addActivityToSummary(activity) {
   var updateForm = $("<li class = 'collection-item'></li>");
   var typeButtonCancel = $("<button class='waves-effect waves-light btn'>Cancel</button>"); 
   typeButtonCancel.click(function(){
-    $(this).parent().parent().children().eq(9).slideUp(); 
+    $(this).parent().parent().children().eq(10).slideUp(); 
     $(this).parent().parent().children().eq(7).show(); 
   })
 
@@ -259,7 +327,9 @@ function addActivityToSummary(activity) {
 
 function populateActivities(data) {
   for (let activity of data.activities) {
-    addActivityToSummary(activity);
+    if (activity.temperature) { // sometimes temperature is not stored properly
+      addActivityToSummary(activity);
+    }
   }
 }
 
@@ -336,11 +406,28 @@ function updateTotalView(devices) {
       })
       .done(function(data, textStatus, jqXHR) {
         for (activity of data.activities) {
-
           let time = new Date();
           let currentTime = time.getTime();
 
-          if ((currentTime - activity.timeStarted) < 604800000) {
+          // console.log(activity.timeStarted);
+          // let tempDate = activity.timeStarted.split(" ")[0];
+          // let tempTime = activity.timeStarted.split(" ")[1];
+
+          // let tempMonth = tempDate.split("/")[0];
+          // let tempDay = tempDate.split("/")[1];
+          // let tempYear = tempDate.split("/")[2];
+
+          // let tempHours = tempTime.split(":")[0];
+          // let tempMinutes = tempTime.split(":")[1];
+          // let tempSeconds = tempTime.split(":")[2];
+
+          // var tempStartTime = new Date(tempYear - 1, tempMonth, tempDay, tempHours, tempMinutes, tempSeconds);
+          // console.log("constructed time: " + tempStartTime);
+
+          // console.log(currentTime - tempStartTime.getTime() / 1000);
+
+          if ((currentTime - activity.timeAdded) < 604800000) {
+
             let calories = Number($("#totalCalories").html()) + activity.calories; 
             $("#totalCalories").html(calories); 
             let duration = Number($("#totalDuration").html()) + activity.duration; 
