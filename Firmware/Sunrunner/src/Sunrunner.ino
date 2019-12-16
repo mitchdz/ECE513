@@ -5,7 +5,7 @@
 #include "SunrunrStorage.h"
 #include "PingPattern.h"
 #include "UVPattern.h"
-
+#include "ActivityPattern.h"
 
 
 SYSTEM_THREAD(ENABLED);
@@ -30,6 +30,8 @@ unsigned long authTimer = 0;
 
 PingPattern pingRGB = PingPattern(LED_PRIORITY_IMPORTANT);
 UVPattern uvRGB = UVPattern(LED_PRIORITY_IMPORTANT);
+ActivityPattern actRGB = ActivityPattern(LED_PRIORITY_NORMAL);
+
 
 unsigned long datalogTimer = 0;
 
@@ -222,12 +224,13 @@ void loop()
 			{
 				storage.newActivity(gps.getGPSTime());
 				deviceMode = ACTIVE;
-				
+				actRGB.setActive();
 			}
 			else if(deviceMode == ACTIVE)
 			{
 				publishActivityData();
 				deviceMode = IDLE;
+				actRGB.setActive(false);
 			}
 		}
 	}
