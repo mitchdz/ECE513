@@ -319,6 +319,25 @@ function createUVGraph(uvData,date){
   chart.render();
 }
 
+function createActivityMap(lat, lng, date)
+{
+  let midLat = 0;
+  let midLong = 0;
+  
+  for(let latVal of lat)
+    midLat += latVal;
+
+  for(let longVal of lng)
+    midLong += longVal;
+
+  midLat /= lat.length;
+  midLong /= lng.length;
+
+  var map = new google.maps.Map(document.getElementById('mapContainer' + date), {zoom: 12, center: {lat:midLat, lng:midLong}});
+  let markers = [];
+  for(let i = 0; i < Math.min(lat.length, lng.length); i++)
+    markers[i] = new google.maps.Marker({position: {lat: lat[i], lng: lng[i]}, map: map});
+}
 
 function addActivityToSummary(activity) {
   var newCollection = $("<ul class='collection with-header' id='ul" + activity.timeAdded + "'></ul>"); 
@@ -412,6 +431,7 @@ function addActivityToSummary(activity) {
   $('#summaryDiv').append(newCollection); 
   createGPSSpeedGraph(activity.gps_speed, activity.timeAdded);
   createUVGraph(activity.uv, activity.timeAdded);
+  createActivityMap(activity.gps_lat, activity.gps_long, activity.timeAdded);
 }
 
 
