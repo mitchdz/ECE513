@@ -83,7 +83,7 @@ function getWeatherInfo() {
   }
 
   $.ajax({
-    url: 'http://api.openweathermap.org/data/2.5/forecast?appid=6e5be09cc06697c608c9d8a12dda7698&lat='+lat+'&lon='+lon,
+    url: 'https://api.openweathermap.org/data/2.5/forecast?appid=6e5be09cc06697c608c9d8a12dda7698&lat='+lat+'&lon='+lon,
     type: 'GET',
     dataType: 'json'
   })
@@ -147,7 +147,7 @@ function getUVInfo() {
   var lat = $("#userLatitude").val(); 
   var lon = $("#userLongitude").val(); 
   $.ajax({
-    url: 'http://api.openweathermap.org/data/2.5/uvi/forecast?appid=6e5be09cc06697c608c9d8a12dda7698&lat='+lat+'&lon='+lon,
+    url: 'https://api.openweathermap.org/data/2.5/uvi/forecast?appid=6e5be09cc06697c608c9d8a12dda7698&lat='+lat+'&lon='+lon,
     dataType: 'json'
   })
   .done(function(data, textSatus, jqXHR){ 
