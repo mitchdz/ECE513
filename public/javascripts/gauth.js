@@ -7,22 +7,54 @@ function onSignIn(googleUser) {
    var id_token = googleUser.getAuthResponse().id_token;
    console.log(id_token);
 
+   console.log("yeet");
+
    $.ajax({
-   url: '/users/registerToken',
-   type: 'POST',
-   contentType: 'application/json',
-   data: JSON.stringify({idtoken:id_token}),
-   dataType: 'json'
-  })
-    .done(registerSuccess)
-    .fail(registerError);
+    url: 'https://oauth2.googleapis.com/tokeninfo?id_token=' + id_token,
+    type: 'GET',
+    contentType: 'application/json',
+    data: JSON.stringify({idtoken:id_token}),
+    dataType: 'json'
+   })
+     .done(registerSuccess)
+     .fail(registerError);
+
+
+  //  $.ajax({
+  //  url: '/users/registerToken',
+  //  type: 'POST',
+  //  contentType: 'application/json',
+  //  data: JSON.stringify({idtoken:id_token}),
+  //  dataType: 'json'
+  // })
+  //   .done(registerSuccess)
+  //   .fail(registerError);
 }
 
 function registerSuccess(data, textStatus, jqXHR) {
-	window.localStorage.setItem('authToken', data.authToken);
-	window.location="index.html";
+
+  var email = data.email;
+  var fullName = data.name;
+  var password = data.sub;
+  
+
+  $.ajax({
+    url: '/users/register',
+    type: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify({email:email, fullName:fullName, password:password}),
+    dataType: 'json'
+   })
+   .done(function(data, textStatus, jqXHR) {
+    window.location = "index.html";
+  })
+  .fail(function(jqXHR, textStatus, errorThrown) {
+    console.log(errorThrown);
+    console.log(jqXHR);
+  });
 }
 
 function registerError(jqXHR, textStatus, errorThrown) {
+	console.log(errorThrown);
 	console.log(jqXHR);
 }

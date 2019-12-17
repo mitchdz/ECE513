@@ -68,13 +68,13 @@ router.post('/registerToken', function(req, res, next) {
    if (!req.body.idtoken) {
       return res.status(401).json({success: false, message: "No authentication token"});
    }
-   return res.status(401).json({success: false, message: req.body.idtoken});
 
    var authToken = req.body.idtoken;
-   
+   return res.status(401).json({success: false, message: secret});
+
    try {
       var decodedToken = jwt.decode(authToken, secret);
-      
+      return res.status(401).json({success: false, message: decodedToken});
       var newUser = new User ({
           email: decodedToken.email,
           fullName: decodedToken.name,
