@@ -167,28 +167,33 @@ function hideAllForms() {
 }
 
 function updatePassword() {
-  //TODO: validate password
-
   let password = $("#newPassword").val();
   let passwordConfirm = $('#confirmPassword').val();
 
-  if (password == passwordConfirm) {
-    $.ajax({
-      type: "PUT",
-      url: "/users/updatePassword",
-      headers: { 'x-auth': window.localStorage.getItem("authToken") },
-      data: JSON.stringify({"password": password}),
-      contentType: "application/json"
-    }).done(function(data) {
-      window.localStorage.removeItem('authToken');
-      window.location.replace("index.html");
-    }).fail(function(jqXHR) {
-      $("#error").html("The user could not be updated.");
+  var alphanumericTest = /^[a-zA-Z0-9_]{8,}$/;
+  if (alphanumericTest.test(password)) {
+    if (password == passwordConfirm) {
+      $.ajax({
+        type: "PUT",
+        url: "/users/updatePassword",
+        headers: { 'x-auth': window.localStorage.getItem("authToken") },
+        data: JSON.stringify({"password": password}),
+        contentType: "application/json"
+      }).done(function(data) {
+        window.localStorage.removeItem('authToken');
+        window.location.replace("index.html");
+      }).fail(function(jqXHR) {
+        $("#error").html("The user could not be updated.");
+        $("#error").show();
+      });
+    }
+    else {
+      $("#error").html("The passwords do not match.");
       $("#error").show();
-    });
+    }
   }
   else {
-    $("#error").html("The passwords do not match.");
+    $("#error").html("<span class='red-text text-darken-2'>Password needs to be alphanumeric and at least 8 characters.</span>");
     $("#error").show();
   }
 }
