@@ -139,16 +139,12 @@ function updateTotalsView(userDevices) {
 
       var minimumDistance = 99999999; // arbitrarily large number
       for (personalActivity of listOfPersonalActivities) {
-        console.log(personalActivity);
         var distanceBetweenKm = getDistanceFromLatLonInKm(personalActivity.lat, personalActivity.lon, activity.gps_lat[0], activity.gps_long[0]);
-        console.log("distance: " + distanceBetweenKm);
-        console.log(distanceBetweenKm);
         if (distanceBetweenKm < minimumDistance) {
           minimumDistance = distanceBetweenKm;
         }
       }
 
-      console.log("minimum: " + minimumDistance);
       if (minimumDistance < 100) {
         isLocal = true;
       }
@@ -182,7 +178,6 @@ function updateTotalsView(userDevices) {
         uvList[i] = uvList[i] + tempUvSum;
       }
     }
-    console.log(listOfPersonalActivities);
 
     createSevenDayGraph(sevenDayContainerDuration, 
                         "Seven Day Total Duration", 
@@ -407,17 +402,17 @@ function addActivityToSummary(activity) {
   let walkButton = $("<button style='margin-right:15px;' class='waves-effect waves-light btn' id='walk" + activity.timeAdded + "'>Walk</button>");
   // document.getElementById("walk" + activity.timeAdded).addEventListener("click", updateType(activity, "walk"));
   walkButton.click(function() {
-    updateType(activity, "walk");
+    updateActivityType(activity, "walk");
   }); 
 
   let runButton = $("<button style='margin-right:15px;' class='waves-effect waves-light btn' id='run" + activity.timeAdded + "'>Run</button>");
   runButton.click(function() {
-    updateType(activity, "run");
+    updateActivityType(activity, "run");
   }); 
 
   let bikeButton = $("<button style='margin-right:15px;' class='waves-effect waves-light btn' id='bike" + activity.timeAdded + "'>Bike</button>");
   bikeButton.click(function() {
-    updateType(activity, "bike");
+    updateActivityType(activity, "bike");
   }); 
 
   updateForm.append(typeButtonCancel); 
@@ -443,34 +438,22 @@ function populateActivities(data) {
   }
 }
 
-function updateType(activity, updatedType) {
-  var unix = String($(this).attr("id")).slice(4,); 
+function updateActivityType(activity, updatedType) {
+  console.log(activity.timeAdded);
+  console.log(updatedType);
   $.ajax({
     url: '/devices/updateType', 
-    type: 'POST', 
+    type: 'PUT', 
     headers: { 'x-auth': window.localStorage.getItem("authToken") },
     contentType: 'application/json', 
     data: JSON.stringify({timeAdded:activity.timeAdded, newType:updatedType}), 
     dataType: 'json'
   })
   .done(function(data, textStatus, jqXHR){
-    if(data.success){
-      window.location.replace("activity.html"); 
-    }
-    else{
-      $("error").html(jqXHR.textStatus);
-      $("error").show();
-    }
+    window.location.replace("summary.html");
   })
   .fail(function(jqXHR, textStatus, errorThrown){
-    if( jqXHR.status === 401 ) {
-      window.localStorage.removeItem("authToken");
-      window.location.replace("login_page.html");
-    } 
-    else {
-      $("error").html(jqXHR.textStatus);
-      $("error").show();
-    }
+    console.log(jqXHR.responseText);
   })
 }
 

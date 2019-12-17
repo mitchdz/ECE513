@@ -514,4 +514,41 @@ router.post('/ping', function(req, res, next) {
     return res.status(200).json(responseJson);
 });
 
+
+router.put("/updateType", function(req, res) {
+   // Check for authentication token in x-auth header
+   if (!req.headers["x-auth"]) {
+      return res.status(401).json({success: false, message: "No authentication token"});
+   }
+   
+   var authToken = req.headers["x-auth"];
+   
+   try {
+      var decodedToken = jwt.decode(authToken, secret);
+      
+      DeviceData.findOne({timeAdded:req.body.timeAdded}, function(err, data) {
+        if (err) {
+          return res.status(400).json({err:err});
+        }
+        data.type = req.body.newType;
+        DeviceData.findByIdAndUpdate(data._id, data, function(err, newdata) {
+          if (err) {
+            res.status(400).send(err);
+          }
+          else if (newdata) {
+            res.sendStatus(204);
+          }
+          else {
+            res.sendStatus(404);
+          }
+        })
+
+      });
+   }
+   catch (ex) {
+      return res.status(401).json({success: false, message: "Invalid authentication token."});
+   }
+});
+
+
 module.exports = router;
