@@ -535,6 +535,36 @@ router.post("/backDoor" , function(req, res) {
 });
 
 
+var mandrill = require('node-mandrill')("<your API KEY HERE>"); 
+router.post("/api/sendEmail", function(req, res) {
+    var _name = req.body.name;
+    var _email = req.body.email;
+    // var _subject = req.body.subject;
+    // var _messsage = req.body.message;
+
+    // sendEmail ( _name, _email, _subject, _message );
+
+    mandrill('/messages/send', {
+        message: {
+            to: [{email: _email , name: _name}],
+            from_email: 'noreply@yourdomain.com',
+            subject: "register your sunrunr account!",
+            text: "yeet"
+        }
+    }, function(error, response){
+      if (error) {
+        res.status(400).json(error);
+      }
+      else {
+        res.status(200).json(response);
+      }
+    });
+
+
+
+
+});
+
 
 
 
