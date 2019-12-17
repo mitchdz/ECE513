@@ -1,6 +1,7 @@
 let express = require('express');
 let router = express.Router();
 let User = require("../models/users");
+let StagingUser = require("../models/stagingUsers");
 let Device = require("../models/device");
 let DeviceData = require("../models/deviceData");
 let fs = require('fs');
@@ -564,6 +565,93 @@ router.post("/api/sendEmail", function(req, res) {
 
 
 });
+
+
+/* Register a new user */
+router.post('/addStagingUser', function(req, res, next) {
+   bcrypt.hash(req.body.password, 10, function(err, hash) {
+      if (err) {
+         res.status(400).json({success : false, message : err.errmsg, error:"bcryptjs error"});
+      }
+      else {
+        var time = new Date();
+        var currentTime = time.getTime();
+
+        var newUser = new StagingUser ({
+            email: req.body.email,
+            fullName: req.body.fullName,
+            AuthorizeKey: req.body.APIKEY,
+            timeCreated: currentTime,
+            passwordHash: hash
+        });
+
+        newUser.save(function(err, user) {
+          if (err) {
+             res.status(400).json({success : false, message : err.errmsg, error: "Bad attributes"});
+          }
+          else {
+             res.status(201).json({success : true, message : user.fullName + "has been created"});
+          }
+        });
+      }
+   });
+});
+
+/* Authorize a new user */
+router.post('/authorizeStagingUser', function(req, res, next) {
+  var email = req.body.email;
+  var userAPIKEY = req.body.APIKEY;
+
+  StagingUser.findOne({email:email}, function(err, stagingUser) {
+    if (err) {
+      return res.status(400).json({success: false, message: err});
+    }
+    else {
+      if (userAPIKEY == stagingUser.AuthorizeKey) {
+
+        var time = new Date();
+        var currentTime = time.getTime();
+
+        if ((currentTime - stagingUser.timeCreated) > 86400000) {
+          StagingUser.deleteOne({_id: StagingUser._id}, function(err) {
+          if (err) {
+            res.status(400).json({success: false, err:err, message: "Could not remove from staging"})
+          }
+          });
+          return res.status(400).json({success:false, message:"APIKEY is too old."});
+        } 
+
+        var newUser = new User ({
+            email: email,
+            fullName: stagingUser.fullName,
+            passwordHash: stagingUser.passwordHash,
+            uvThreshold: 3
+        });
+
+        newUser.save(function(err, user) {
+          if (err) {
+             res.status(400).json({success : false, message : err, error: "Bad attributes"});
+          }
+          else {
+             res.status(201).json({success : true, message : user.fullName + "has been created"});
+          }
+        });
+
+        StagingUser.deleteOne({_id: StagingUser._id}, function(err) {
+        if (err) {
+          res.status(400).json({success: false, err:err, message: "Could not remove from staging"})
+        }
+        });
+
+
+      }
+      else {
+        res.status(400).json({success : false, message : "Wrong API key."});
+      }
+    }
+  }).remove().exec();
+});
+
 
 
 

@@ -23,33 +23,46 @@ function sendRegisterRequest() {
     $('#ServerResponse').show();
     return;
   }
-  else {
-    message = "Please enter the following key to register your account: " + getNewApikey();
+  else { 
 
-    Email.send({
-        SecureToken : "b543a1e3-2be0-4581-8def-9b6ebc3b2a50",
-        To : 'mitch_dz@hotmail.com',
-        From : "mitchdz@email.arizona.edu",
-        Subject : "This is the subject",
-        Body : "HEY YOUUUU"
-    }).then(
-      message => console.log(message)
-    );
+    var alphanumericTest = /^[a-zA-Z0-9_]{8,}$/;
+    if (alphanumericTest.test(password)) {
+      authorizationKey = getNewApikey();
+      message = "Please enter the following key to register your account: " + authorizationKey;
+
+      Email.send({
+          SecureToken : "b543a1e3-2be0-4581-8def-9b6ebc3b2a50",
+          // Host : "smtp.elasticemail.com",
+          // Username : "mitchdz@email.arizona.edu",
+          // Password : "PASS",
+          To : email,
+          From : "mitchdz@email.arizona.edu",
+          Subject : "Register your Sunrunr Account",
+          Body : message
+      }).then(
+        message => console.log(message)
+      );
 
 
-    // $.ajax({
-    //   url: '/users/api/sendEmail',
-    //   type: 'POST',
-    //   contentType: 'application/json',
-    //   data: JSON.stringify({email:email, 
-    //       fullName:fullName, 
-    //       email:email, 
-    //       subject:"Register your Sunrunr Account",
-    //       message:"yeet"}),
-    //   dataType: 'json'
-    //  })
-    //     .done(registerSuccess)
-    //     .fail(registerError);
+      $.ajax({
+        url: '/users/addStagingUser',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({email:email, 
+            fullName:fullName, 
+            APIKEY: authorizationKey,
+            password: password
+            }),
+        dataType: 'json'
+       })
+          .done(registerSuccess)
+          .fail(registerError);
+    } 
+    else {
+    $('#ServerResponse').html("<span class='red-text text-darken-2'>Password needs to be alphanumeric and at least 8 characters.</span>");
+    $('#ServerResponse').show();
+    return;
+    }
   }
 
   // minimum 8 characters, can be any alphanumeric
@@ -75,7 +88,8 @@ function sendRegisterRequest() {
 
 function registerSuccess(data, textStatus, jqXHR) {
   if (data.success) {
-    window.location = "index.html";
+    $('#ServerResponse').html("<span> Please check your email.</span>");
+    $('#ServerResponse').show();
   }
   else {
     $('#ServerResponse').html("<span class='red-text text-darken-2'>Error: " + data.message + "</span>");

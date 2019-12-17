@@ -14,7 +14,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script src="https://smtpjs.com/v3/smtp.js"></script>
     <link href="/stylesheets/sunrunr.css" rel="stylesheet">
-    <script src="/javascripts/register.js"></script>
+    <script src="/javascripts/authorize.js"></script>
 
     <!--Let browser know website is optimized for mobile-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -41,28 +41,18 @@
       <div class="col s12 m6">
         <div class="card blue-grey ">
           <div class="card-content white-text">
-            <span class="card-title">Account Registration</span>
+            <span class="card-title">Authorize Account</span>
             <div class="input-field">
               <label for="email">Email</label>
               <input type="email" id="email" name="email" >
             </div>
             <div class="input-field">
-              <label for="fullName">Full Name</label>
-              <input type="text" id="fullName" name="fullName" >
-            </div>
-            <div class="input-field">
-              <label for="password">Password</label>
-              <input type="password" id="password" name="password" >
-            </div>
-            <div class="input-field">
-              <label for="passwordConfirm">Confirm Password</label>
-              <input type="password" id="passwordConfirm" name="passwordConfirm" >
+              <label for="APIKEY">APIKEY</label>
+              <input type="text" id="APIKEY" name="APIKEY" >
             </div>
             <div class="card-action">
-              <div><a id="signup" class="waves-effect waves-light btn">Register</a></div>
+              <div><a id="signup" class="waves-effect waves-light btn">Authorize</a></div>
               <div id="account">Have an account? <a href="index.html">Sign In</a></div>
-              <div id="gauth">Register with Google? <a href="gauth.html">GOOGLE</a></div>
-              <div id="authorize"><a href="authorize.html">authorize account</a></div>
             </div>
           </div>
           <div class="card-panel blue-text" id="ServerResponse" style="display: none"></div>
