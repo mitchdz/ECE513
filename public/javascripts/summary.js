@@ -105,6 +105,7 @@ function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
     Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2); 
   let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
   let distance = radiusEarth * c; //Distance in km
+  console.log(distance);
   return distance;
 }
 
@@ -125,21 +126,31 @@ function updateTotalsView(userDevices) {
     dataType: 'json', 
   })
   .done(function(data, textStatus, jqXHR) {
-    listOfPersonalActivities = [];
+    var listOfPersonalActivities = [];
+
     for (activity of data.activities) {
+      for (device of userDevices) {
+        if (device.deviceId == activity.deviceId) {
+          listOfPersonalActivities.push({lat:activity.gps_lat[0], lon:activity.gps_long[0]});
+        }
+      }
+    }
+
+    for (activity of data.activities) {
+      console.log(activity);
       let isPersonal = false;
       let isLocal = false;
 
       for (device of userDevices) {
         if (device.deviceId == activity.deviceId) {
-          listOfPersonalActivities.push({lat:activity.gps_lat[0], lon:activity.gps_long[0]});
           isPersonal = true;
         }
       }
 
       var minimumDistance = 99999999; // arbitrarily large number
+      var distanceBetweenKm = minimumDistance;
       for (personalActivity of listOfPersonalActivities) {
-        var distanceBetweenKm = getDistanceFromLatLonInKm(personalActivity.lat, personalActivity.lon, activity.gps_lat[0], activity.gps_long[0]);
+        distanceBetweenKm = getDistanceFromLatLonInKm(personalActivity.lat, personalActivity.lon, activity.gps_lat[0], activity.gps_long[0]);
         if (distanceBetweenKm < minimumDistance) {
           minimumDistance = distanceBetweenKm;
         }
@@ -148,6 +159,7 @@ function updateTotalsView(userDevices) {
       if (minimumDistance < 100) {
         isLocal = true;
       }
+      console.log(isLocal);
 
       let time = new Date();
       let currentTime = time.getTime();
