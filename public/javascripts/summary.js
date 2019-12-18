@@ -105,7 +105,6 @@ function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
     Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2); 
   let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
   let distance = radiusEarth * c; //Distance in km
-  console.log(distance);
   return distance;
 }
 
@@ -137,7 +136,6 @@ function updateTotalsView(userDevices) {
     }
 
     for (activity of data.activities) {
-      console.log(activity);
       let isPersonal = false;
       let isLocal = false;
 
@@ -159,7 +157,6 @@ function updateTotalsView(userDevices) {
       if (minimumDistance < 100) {
         isLocal = true;
       }
-      console.log(isLocal);
 
       let time = new Date();
       let currentTime = time.getTime();
