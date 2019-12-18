@@ -221,7 +221,8 @@ function updateUv() {
 
 
 function updateEmail() {
-  let inputEmail = $("#newEmail").val();
+  var inputEmail = $("#newEmail").val();
+  console.log(inputEmail);
 
   $.ajax({
     url: "/users/updateEmail",
@@ -229,11 +230,11 @@ function updateEmail() {
     headers: { 'x-auth': window.localStorage.getItem("authToken") },
     data: JSON.stringify({"email": inputEmail}),
     contentType: "application/json"
-  }).done(function(data) {
+  }).done(function(jqXHR) {
     window.localStorage.removeItem('authToken');
     window.location = "index.html";
-    // location.reload();
   }).fail(function(jqXHR) {
+    console.log(jqXHR);
     if (jqXHR.status == 400) {
       $("#error").html("That email already exists.");
       $('#error').show();
